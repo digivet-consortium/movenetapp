@@ -8,17 +8,17 @@ ui <- fluidPage(
   navlistPanel(
     "Inputs",
     tabPanel("Movement data",
-             csvFileUI("movement")),
+             dataInputUI("movement")),
     tabPanel("Holding data",
-             csvFileUI("holding")),
+             dataInputUI("holding")),
     widths = c(3, 9)
   )
 )
 
 
 server <- function(input, output) {
-  csvFileServer("movement")
-  csvFileServer("holding")
+  dataInputServer("movement")
+  dataInputServer("holding")
 }
 
 # Run the application

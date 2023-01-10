@@ -1,5 +1,5 @@
 # Module UI function
-csvFileUI <- function(id) {
+dataInputUI <- function(id) {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
@@ -56,7 +56,7 @@ csvFileUI <- function(id) {
   )
 }
 
-csvFileServer <- function(id, stringsAsFactors = FALSE) {
+dataInputServer <- function(id, stringsAsFactors = FALSE) {
   moduleServer(
     id,
     function(input, output, session) {
