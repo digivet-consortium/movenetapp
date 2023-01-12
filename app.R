@@ -11,6 +11,8 @@ ui <- fluidPage(
              dataInputUI("movement")),
     tabPanel("Holding data",
              dataInputUI("holding")),
+    tabPanel("Anonymisation functions",
+             anonymisationUI("anonymisation")),
     widths = c(3, 9)
   )
 )
@@ -19,6 +21,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   movement_data <- dataInputServer("movement")
   holding_data <- dataInputServer("holding")
+  anonymisationServer("anonymisation", movement_data, holding_data)
 }
 
 # Run the application
