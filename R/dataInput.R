@@ -1,5 +1,3 @@
-library(rlang)
-
 ###################################
 ### Data Input - User interface ###
 ###################################
@@ -53,7 +51,6 @@ dataInputUI <- function(id) {
                  width = "100%"),
     dataTableOutput(ns("datatable"))
 
-
   )
 }
 
@@ -61,7 +58,7 @@ dataInputUI <- function(id) {
 ### Data Input - Server logic ###
 #################################
 
-dataInputServer <- function(id, stringsAsFactors = FALSE) {
+dataInputServer <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -106,7 +103,6 @@ dataInputServer <- function(id, stringsAsFactors = FALSE) {
                                              choices = config_list[[x]],
                                              selected = config_list[[x]])})
       })
-
 
 # Populate column header selectInputs -------------------------------------
 
@@ -158,14 +154,17 @@ dataInputServer <- function(id, stringsAsFactors = FALSE) {
                                                             "%AD"),
                                        encoding = input$encoding))
 
-        #Update the input_data reactiveVal to contain the extracted dataframe
+        # Update the input_data reactiveVal to contain the extracted dataframe
         input_data(dataframe)
       })
 
+      # Pass the extracted data to the main app
+      return(input_data)
+
+      # View the extracted data upon request via actionButton
       observeEvent(input$view_extracted_data, {
         output$datatable <- renderDataTable({input_data()})
       })
-
 
     }
   )

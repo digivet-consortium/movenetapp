@@ -17,8 +17,8 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-  dataInputServer("movement")
-  dataInputServer("holding")
+  movement_data <- dataInputServer("movement")
+  holding_data <- dataInputServer("holding")
 }
 
 # Run the application
