@@ -6,7 +6,6 @@
 ######################################
 
 anonymisationUI <- function(id) {
-  ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
 
     # Add explanatory blurb
@@ -14,7 +13,7 @@ anonymisationUI <- function(id) {
     fluidRow(
       column(6,
              h3("Rounding"),
-             checkboxGroupInput(ns("rounding_units"),
+             checkboxGroupInput("rounding_units",
                                 label = "Unit to round dates down to",
                                 choices = list("week", "month",
                                                "2 months" = "bimonth",
@@ -24,7 +23,7 @@ anonymisationUI <- function(id) {
                                   list("week","month","quarter","year"))),
       column(6,
              h3("Jitter"),
-             checkboxGroupInput(ns("jitter_days"),
+             checkboxGroupInput("jitter_days",
                                 label = "Range of jitter (+/- n days) to apply
                                 to dates",
                                 choices = list(
@@ -35,25 +34,9 @@ anonymisationUI <- function(id) {
                                   "91 (~ equivalent to range of 6 months)" = 91,
                                   "183 (~ equivalent to range of 1 year)" = 183),
                                 selected = list(4, 15, 46, 183)),
-             numericInput(ns("jitter_simulations"),
+             numericInput("jitter_simulations",
                           label =
-                            "Number of jitter simulations to perform per range",
-                          value = 5))),
-  actionButton(ns("create_networks"), "Generate networks", width = "100%"),
+                            "Number of simulations to perform per jitter range",
+                          value = 5)))
   )
 }
-
-####################################
-### Anonymisation - Server logic ###
-####################################
-
-anonymisationServer <- function(id, movement_data, holding_data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-
-
-# Change id's to numbers --------------------------------------------------
-
-
-})}
