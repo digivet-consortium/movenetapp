@@ -1,5 +1,11 @@
 #On progress bars: https://shiny.rstudio.com/articles/progress.html
 
+library(dplyr)
+library(lubridate)
+library(networkDynamic)
+library(parallel)
+library(shinyWidgets)
+library(tsna)
 
 ########################################
 ### Create networks - User interface ###
@@ -39,6 +45,9 @@ createNetworksUI <- function(id) {
                             "Number of simulations to perform per jitter range",
                           value = 5))),
     actionButton(ns("create_networks"), "Generate networks", width = "100%"),
+    progressBar(ns("create_networks_pb"), value = 0),
+    textOutput(ns("j")),
+    #tableOutput(ns("anon_data")),
     h3("Network measures"),
     fluidRow(
       column(6,
@@ -65,10 +74,62 @@ createNetworksServer <- function(id, movement_data, holding_data) {
     id,
     function(input, output, session) {
 
+      networks <- reactiveValues()
 
-      # Change id's to numbers - use anonymise
-      # Apply round and jitter functions
-      # Create networkDynamic objects
+      observeEvent(input$create_networks, {
+
+# Anonymise holding ids ---------------------------------------------------
+
+        #Change holding ids to numbers (required for temporal networks)
+        anonymised_data <- simplified_anonymise(movement_data())
+        movement_data(anonymised_data)
+
+# Create temporal networks ------------------------------------------------
+        n_jitter_networks <- length(input$jitter_days)*input$jitter_simulations
+        n_rounded_networks <- length(input$rounding_units)
+        n_networks <- 1 + n_jitter_networks + n_rounded_networks
+
+        #Create true network
+        networks$true <- movedata2networkDynamic(anonymised_data)
+        updateProgressBar(session, "create_networks_pb", value = 1,
+                          total = n_networks, range_value = c(0, n_networks))
+
+        #Apply jitter
+        jitter_days_reps <- rep(input$jitter_days, input$jitter_simulations)
+        jitter_networks <-
+          lapply(seq_along(jitter_days_reps), function(x){
+            nw <- simplified_coarsen_date(anonymised_data, rounding_unit = FALSE,
+                                          jitter = jitter_days_reps[x]) |>
+              movedata2networkDynamic()
+            updateProgressBar(session, "create_networks_pb", value = 1 + x,
+                              total = n_networks, range_value = c(0, n_networks))
+            return(nw)
+          })
+        names(jitter_networks) <-
+          paste0("jitter (", rep(input$jitter_days, input$jitter_simulations)," days)")
+        networks$jitter <- jitter_networks
+
+        #Apply rounding
+        week_start <- wday(min(anonymised_data[['date']]))
+        rounded_networks <-
+          lapply(seq_along(input$rounding_units), function(x){
+            nw <- simplified_coarsen_date(anonymised_data, jitter = FALSE,
+                                          rounding_unit = input$rounding_units[x],
+                                          week_start = week_start) |>
+              movedata2networkDynamic()
+            updateProgressBar(session, "create_networks_pb",
+                              value = 1 + n_jitter_networks + x,
+                              total = n_networks, range_value = c(0, n_networks))
+            return(nw)
+          })
+        names(rounded_networks) <- paste0(input$rounding_units,"ly")
+        networks$rounded <- rounded_networks
+      })
+
+# Calculate temporal network measures -------------------------------------
+
+
+
 
       # Fig 1 prep: monthly Max reach
       ###############################
