@@ -46,7 +46,6 @@ createNetworksUI <- function(id) {
                           value = 5))),
     actionButton(ns("create_networks"), "Generate networks", width = "100%"),
     progressBar(ns("create_networks_pb"), value = 0),
-    textOutput(ns("j")),
     #tableOutput(ns("anon_data")),
     h3("Network measures"),
     fluidRow(
@@ -75,6 +74,7 @@ createNetworksServer <- function(id, movement_data, holding_data) {
     function(input, output, session) {
 
       networks <- reactiveValues()
+      monthly_networks <- reactiveValues()
 
       observeEvent(input$create_networks, {
 
@@ -85,14 +85,19 @@ createNetworksServer <- function(id, movement_data, holding_data) {
         movement_data(anonymised_data)
 
 # Create temporal networks ------------------------------------------------
+
+        #Some useful variables
         n_jitter_networks <- length(input$jitter_days)*input$jitter_simulations
         n_rounded_networks <- length(input$rounding_units)
         n_networks <- 1 + n_jitter_networks + n_rounded_networks
+        months_in_data <- extract_months(anonymised_data[["date"]])
+        n_monthlynetworks <- n_networks * length(months_in_data)
+        n_allnetworks <- n_networks + n_monthlynetworks
 
         #Create true network
-        networks$true <- movedata2networkDynamic(anonymised_data)
+        networks$true <- list(true = movedata2networkDynamic(anonymised_data))
         updateProgressBar(session, "create_networks_pb", value = 1,
-                          total = n_networks, range_value = c(0, n_networks))
+                          total = n_allnetworks, range_value = c(0, n_allnetworks))
 
         #Apply jitter
         jitter_days_reps <- rep(input$jitter_days, input$jitter_simulations)
@@ -102,7 +107,7 @@ createNetworksServer <- function(id, movement_data, holding_data) {
                                           jitter = jitter_days_reps[x]) |>
               movedata2networkDynamic()
             updateProgressBar(session, "create_networks_pb", value = 1 + x,
-                              total = n_networks, range_value = c(0, n_networks))
+                              total = n_allnetworks, range_value = c(0, n_allnetworks))
             return(nw)
           })
         names(jitter_networks) <-
@@ -119,11 +124,28 @@ createNetworksServer <- function(id, movement_data, holding_data) {
               movedata2networkDynamic()
             updateProgressBar(session, "create_networks_pb",
                               value = 1 + n_jitter_networks + x,
-                              total = n_networks, range_value = c(0, n_networks))
+                              total = n_allnetworks, range_value = c(0, n_allnetworks))
             return(nw)
           })
         names(rounded_networks) <- paste0(input$rounding_units,"ly")
         networks$rounded <- rounded_networks
+
+        #Create monthly networks
+        monthly_networks$true <-
+          extract_monthly_networks(networks$true, input$threads, months_in_data)
+        updateProgressBar(session, "create_networks_pb",
+                          value = n_networks + length(months_in_data),
+                          total = n_allnetworks, range_value = c(0, n_allnetworks))
+        monthly_networks$jitter <-
+          extract_monthly_networks(networks$jitter, input$threads, months_in_data)
+        updateProgressBar(session, "create_networks_pb",
+                          value = n_networks + (n_jitter_networks + 1)*length(months_in_data),
+                          total = n_allnetworks, range_value = c(0, n_allnetworks))
+        monthly_networks$rounded <-
+          extract_monthly_networks(networks$rounded, input$threads, months_in_data)
+        updateProgressBar(session, "create_networks_pb",
+                          value = n_allnetworks,
+                          total = n_allnetworks, range_value = c(0, n_allnetworks))
       })
 
 # Calculate temporal network measures -------------------------------------
