@@ -34,11 +34,11 @@ movedata2networkDynamic <- function(data){
 #' @export
 parallel_max_reachabilities <- function(networks, n_threads){
   cl <- makeCluster(n_threads)
+  on.exit(stopCluster(cl))
   clusterExport(cl, "tReach")
   max_reachabilities <-
     parSapply(cl, networks,
               function(x){max(tReach(x, graph.step.time = 1))})
-  stopCluster(cl)
   return(max_reachabilities)
 }
 # N.B. This step is super-slow without parallel processing.
@@ -77,6 +77,7 @@ extract_months <- function(data){
 extract_monthly_networks <- function(networks, n_threads, months_in_data){
 
   cl <- makeCluster(n_threads)
+  on.exit(stopCluster(cl))
   clusterExport(cl, c("network.extract","months_in_data"), envir = environment())
   monthly_networks <-
     parLapply(cl, networks,
@@ -86,7 +87,6 @@ extract_monthly_networks <- function(networks, n_threads, months_in_data){
                                   rule = "any",
                                   trim.spells = TRUE)})})
   names(monthly_networks) <- names(networks)
-  stopCluster(cl)
   return(monthly_networks)
 }
 
