@@ -13,7 +13,10 @@ ui <- fluidPage(
              dataInputUI("holding")),
     "Network analysis",
     tabPanel("Generate networks & calculate measures",
-             createNetworksUI("networks")),
+             parallelProcessingInput(),
+             createNetworksUI("networks"),
+             calculateMeasureUI("overall_measures")),
+    tabPanel("Maximum reachability",
     "Modelling",
     widths = c(3, 9)
   )
@@ -23,7 +26,10 @@ ui <- fluidPage(
 server <- function(input, output) {
   movement_data <- dataInputServer("movement")
   holding_data <- dataInputServer("holding")
-  createNetworksServer("networks", movement_data, holding_data)
+  networks <- createNetworksServer("networks", movement_data, holding_data,
+                                   n_threads = reactive(input$threads))
+  measures <- calculateMeasureServer("overall_measures", networks,
+                                     n_threads = reactive(input$threads))
 }
 
 # Run the application
