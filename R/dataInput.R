@@ -158,13 +158,13 @@ dataInputServer <- function(id) {
         input_data(dataframe)
       })
 
-      # Pass the extracted data to the main app
-      return(input_data)
-
       # View the extracted data upon request via actionButton
       observeEvent(input$view_extracted_data, {
         output$datatable <- renderDataTable({input_data()})
       })
+
+      # Pass the extracted data to the main app
+      return(input_data)
 
     }
   )
