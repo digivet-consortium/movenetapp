@@ -20,12 +20,10 @@ createNetworksUI <- function(id) {
              h4("Rounding"),
              checkboxGroupInput(ns("rounding_units"),
                                 label = "Unit to round dates down to",
-                                choices = list("week", "month",
-                                               "2 months" = "bimonth",
-                                               "3 months" = "quarter",
-                                               "6 months" = "halfyear", "year"),
+                                choices = list("week", "month", "2 months",
+                                               "3 months", "6 months", "year"),
                                 selected =
-                                  list("week","month","quarter","year"))),
+                                  list("week","month","3 months","year"))),
       column(6,
              h4("Jitter"),
              checkboxGroupInput(ns("jitter_days"),
@@ -42,9 +40,10 @@ createNetworksUI <- function(id) {
              numericInput(ns("jitter_simulations"),
                           label =
                             "Number of simulations to perform per range",
+                          min = 1,
                           value = 5))),
     actionButton(ns("create_networks"), "Generate networks", width = "100%"),
-    progressBar(ns("create_networks_pb"), value = 0),
+    progressBar(ns("create_networks_pb"), value = 0, display_pct = TRUE),
   )
 }
 
@@ -99,9 +98,7 @@ createNetworksServer <- function(id, movement_data, holding_data, n_threads){
                               total = counts$n_allnetworks,
                               range_value = c(0, counts$n_allnetworks))
             return(nw)}) |>
-          setNames(paste0("jitter (",
-                          rep(input$jitter_days, input$jitter_simulations),
-                          " days)"))
+          setNames(rep(input$jitter_days, input$jitter_simulations))
 
         #Apply rounding
         week_start <- wday(min(anonymised_data[['date']]))
@@ -117,7 +114,7 @@ createNetworksServer <- function(id, movement_data, holding_data, n_threads){
                               total = counts$n_allnetworks,
                               range_value = c(0, counts$n_allnetworks))
             return(nw)}) |>
-          setNames(paste0(input$rounding_units,"ly"))
+          setNames(input$rounding_units)
 
         #Create monthly networks
         networks$true_monthly <-

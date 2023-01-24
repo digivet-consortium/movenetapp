@@ -13,14 +13,15 @@ calculateMeasureUI <- function(id) {
              h4("Overall network measures"),
              actionButton(ns("calc_max_reachability"),
                           "Maximum reachability", width = "100%"),
-             progressBar(ns("pb_max_reachability"), value = 0)),
+             progressBar(ns("pb_max_reachability"), value = 0,
+                         display_pct = TRUE)),
       column(2),
       column(4,
              h4("Monthly network measures"),
              actionButton(ns("calc_monthly_max_reachability"),
                           "Monthly maximum reachability", width = "100%"),
-             progressBar(ns("pb_monthly_max_reachability"),
-                         value = 0)))
+             progressBar(ns("pb_monthly_max_reachability"), value = 0,
+                         display_pct = TRUE)))
     )
 }
 
@@ -76,6 +77,8 @@ calculateMeasureServer <- function(id, networks, n_threads) {
       #   measures$monthly_max_reachability
       #
       # })
+
+
 
       #return measures to the main app
       return(measures)

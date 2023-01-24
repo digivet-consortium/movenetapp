@@ -5,5 +5,6 @@ parallelProcessingInput <- function(){
       column(4,
              numericInput("threads",
                           label = "Number of threads",
+                          min = 1,
                           value = 4))
   ))}
