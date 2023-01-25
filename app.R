@@ -16,8 +16,11 @@ ui <- fluidPage(
              parallelProcessingInput(),
              createNetworksUI("networks"),
              calculateMeasureUI("overall_measures")),
-    tabPanel("Maximum reachability",
-             plotMeasureOverGradientUI("max_reachability")),
+    tabPanel("Explore a single network"),
+    tabPanel("Compare network measures across jitter/rounding ranges",
+             plotMeasureOverGradientUI("maximum reachability")),
+    tabPanel("Compare distributions of monthly measures across networks",
+             plotMonthlyMeasureViolinplotUI("maximum reachability")),
     "Modelling",
     widths = c(3, 9)
   )
@@ -31,7 +34,8 @@ server <- function(input, output) {
                                    n_threads = reactive(input$threads))
   measures <- calculateMeasureServer("overall_measures", networks,
                                      n_threads = reactive(input$threads))
-  plotMeasureOverGradientServer("max_reachability", measures)
+  plotMeasureOverGradientServer("maximum reachability", measures)
+  plotMonthlyMeasureViolinplotServer("maximum reachability", measures)
 }
 
 # Run the application
