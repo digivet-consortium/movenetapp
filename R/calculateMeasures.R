@@ -36,9 +36,13 @@ calculateMeasureServer <- function(id, networks, n_threads) {
 
       whole_networks <-
         reactive({list(networks$true, networks$jitter, networks$rounded)})
-      monthly_networks <-
-        reactive({list(networks$true_monthly, networks$jitter_monthly,
-                  networks$rounded_monthly)})
+      monthly_networks <- reactive({
+        c(networks$true_monthly, networks$jitter_monthly,
+          networks$rounded_monthly) |>
+        setNames(c(names(networks$true_monthly),
+                   paste0("jitter (", names(networks$jitter_monthly), " days)"),
+                   paste0("rounded (", names(networks$rounded_monthly),")")))
+        })
 
       n_whole_networks <-
         reactive({length(unlist(whole_networks(), recursive = FALSE))})
@@ -68,15 +72,30 @@ calculateMeasureServer <- function(id, networks, n_threads) {
           setNames(c("true","jitter","rounded")
                    [which(c("true","jitter","rounded") %in% names(networks))])
 
-      })
+        })
 
 # Maximum reachability (monthly) ------------------------------------------
 
-      # observeEvent(input$calc_monthly_max_reachability, {
-      #
-      #   measures$monthly_max_reachability
-      #
-      # })
+      observeEvent(input$calc_monthly_max_reachability, {
+
+        measures$monthly_max_reachability <-
+          lapply(seq_along(monthly_networks()),
+                 function(x){
+                   max_reach <-
+                     parallel_max_reachabilities(monthly_networks()[[x]],
+                                                 n_threads())
+                   updateProgressBar(session, "pb_monthly_max_reachability",
+                                     value =
+                                       length(unlist(monthly_networks()[1:x],
+                                                     recursive = FALSE)),
+                                     total = n_monthly_networks(),
+                                     range_value = c(0, n_monthly_networks()))
+                   return(max_reach)
+                 }) |>
+          setNames(names(monthly_networks()))
+
+        browser()
+      })
 
 
 
