@@ -94,10 +94,7 @@ calculateMeasureServer <- function(id, networks, n_threads) {
                  }) |>
           setNames(names(monthly_networks()))
 
-        browser()
-      })
-
-
+        })
 
       #return measures to the main app
       return(measures)
