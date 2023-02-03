@@ -4,6 +4,7 @@ library(dplyr)
 library(lubridate)
 library(networkDynamic)
 library(parallel)
+library(pbapply)
 library(shinyWidgets)
 
 ########################################
@@ -75,7 +76,8 @@ createNetworksServer <- function(id, movement_data, holding_data, n_threads){
         counts$n_rounded_networks <- length(input$rounding_units)
         counts$n_networks <-
           1 + counts$n_jitter_networks + counts$n_rounded_networks
-        counts$months_in_data <- extract_months(anonymised_data[["date"]])
+        counts$months_in_data <-
+          extract_periods(anonymised_data[["date"]], "month")
         counts$n_monthlynetworks <-
           counts$n_networks * length(counts$months_in_data)
         counts$n_allnetworks <- counts$n_networks + counts$n_monthlynetworks
@@ -118,8 +120,8 @@ createNetworksServer <- function(id, movement_data, holding_data, n_threads){
 
         #Create monthly networks
         networks$true_monthly <-
-          extract_monthly_networks(networks$true, n_threads(),
-                                   counts$months_in_data)
+          extract_periodic_subnetworks(networks$true, n_threads(),
+                                       counts$months_in_data)
         updateProgressBar(session, "create_networks_pb",
                           value =
                             counts$n_networks + length(counts$months_in_data),
@@ -127,8 +129,8 @@ createNetworksServer <- function(id, movement_data, holding_data, n_threads){
                           range_value = c(0, counts$n_allnetworks))
 
         networks$jitter_monthly <-
-          extract_monthly_networks(networks$jitter, n_threads(),
-                                   counts$months_in_data)
+          extract_periodic_subnetworks(networks$jitter, n_threads(),
+                                       counts$months_in_data)
         updateProgressBar(session, "create_networks_pb",
                           value =
                             counts$n_networks + (counts$n_jitter_networks + 1)*
@@ -137,8 +139,8 @@ createNetworksServer <- function(id, movement_data, holding_data, n_threads){
                           range_value = c(0, counts$n_allnetworks))
 
         networks$rounded_monthly <-
-          extract_monthly_networks(networks$rounded, n_threads(),
-                                   counts$months_in_data)
+          extract_periodic_subnetworks(networks$rounded, n_threads(),
+                                       counts$months_in_data)
         updateProgressBar(session, "create_networks_pb",
                           value = counts$n_allnetworks,
                           total = counts$n_allnetworks,
