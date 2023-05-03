@@ -77,7 +77,7 @@ dataInputServer <- function(id) {
         data_fields[which(data_fields %in% names(input))]})
 
       # Reactive value to store input data in
-      input_data <- reactiveVal(NULL)
+      input_data <- reactiveValues()
 
 # Use config file ---------------------------------------------------------
 
@@ -154,13 +154,13 @@ dataInputServer <- function(id) {
                                                             "%AD"),
                                        encoding = input$encoding))
 
-        # Update the input_data reactiveVal to contain the extracted dataframe
-        input_data(dataframe)
+        # Update the input_data reactiveValues to contain the extracted dataframe
+        input_data$original <- dataframe
       })
 
       # View the extracted data upon request via actionButton
       observeEvent(input$view_extracted_data, {
-        output$datatable <- renderDataTable({input_data()})
+        output$datatable <- renderDataTable({input_data$original})
       })
 
       # Pass the extracted data to the main app
