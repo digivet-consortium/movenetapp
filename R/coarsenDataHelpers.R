@@ -1,3 +1,7 @@
+library(lubridate)
+library(dplyr)
+library(rlang)
+
 simplified_coarsen_date <- function(data, jitter,
                                     rounding_unit,
                                     week_start = getOption("lubridate.week.start", 7),
@@ -111,3 +115,44 @@ simplified_coarsen_date <- function(data, jitter,
 
   } else return(data)
 }
+
+parallel_coarsen_date <- function(data, n_threads, jitter_set, rounding_set,
+                                  week_start = getOption("lubridate.week.start", 7),
+                                  sum_weight = TRUE, ...){
+
+  jitter_reps <- c(jitter_set, rep(FALSE, length(rounding_set)))
+  rounding_reps <- c(rep(list(FALSE),length(jitter_set)), rounding_set)
+
+  cl <- makeCluster(n_threads)
+  on.exit(stopCluster(cl))
+
+  clusterExport(cl, c("data", "jitter_reps", "rounding_reps", "week_start",
+                      "sum_weight", "floor_date", ":="), envir = environment())
+  clusterEvalQ(cl, {
+    library("dplyr")
+    })
+
+  modified_datasets <-
+    parLapply(cl = cl, seq_along(jitter_reps),
+              function(x){simplified_coarsen_date(
+                data = data,
+                jitter = jitter_reps[[x]],
+                rounding_unit = rounding_reps[[x]],
+                week_start = week_start,
+                sum_weight = sum_weight,
+                ...)})
+
+  jitter_names <-
+    if(length(jitter_set) == 0){NULL
+      } else {paste0("Jittered_", jitter_set,"days")}
+
+  rounded_names <-
+    if(length(rounding_set) == 0){NULL
+      } else {paste0("Rounded_", gsub(" ", "", rounding_set), "WS", week_start)}
+  #Names miss reference to summary functions - would get too complicated
+
+  names(modified_datasets) <-
+    make.unique(paste0("Dates", c(jitter_names, rounded_names)), sep="_")
+
+  return(modified_datasets)
+  }
