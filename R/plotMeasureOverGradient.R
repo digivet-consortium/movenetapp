@@ -10,10 +10,10 @@ plotMeasureOverGradientUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
     # Add explanatory blurb
-    h3(paste("Overall network", id, "for various units of rounding")),
-    plotOutput(ns("plot_rounding")),
     h3(paste("Overall network", id, "for various ranges of jitter")),
-    plotOutput(ns("plot_jitter"))
+    plotOutput(ns("plot_jitter")),
+    h3(paste("Overall network", id, "for various units of rounding")),
+    plotOutput(ns("plot_rounding"))
   )
 }
 
@@ -26,20 +26,32 @@ plotMeasureOverGradientServer <- function(id, measures) {
     id,
     function(input, output, session) {
 
-      output$plot_rounding <-
-        renderPlot(
-          plot_measure_over_anonymisation_gradient(
-            data.frame(
-              sapply(names(measures$max_reachability$rounded),
-                     function(x){as.numeric(duration(x),"days")}),
-              measures$max_reachability$rounded),
-            id, "rounding"))
+      #Create useful data handles
+      non_pseudonymised_data_names <- reactive({
+        names(measures$max_reachability)[which(!str_detect(names(measures$max_reachability),fixed("Pseudonymised")))]})
+
+      jittered_data_names <- reactive({
+        non_pseudonymised_data_names()[str_which(non_pseudonymised_data_names(), fixed("DatesJittered"))]})
+      jittered_data_days <- reactive({
+        as.numeric(str_extract(jittered_data_names(), pattern = "\\d+"))})
+
+      rounded_data_names <- reactive({
+        non_pseudonymised_data_names()[str_which(non_pseudonymised_data_names(), fixed("DatesRounded"))]})
+      rounded_data_days <- reactive({
+        as.numeric(duration(str_match(rounded_data_names(), pattern = "_([a-zA-Z0-9]*)WS")[,2]), "days")})
 
       output$plot_jitter <-
         renderPlot(
           plot_measure_over_anonymisation_gradient(
-            data.frame(as.numeric(names(measures$max_reachability$jitter)),
-                       measures$max_reachability$jitter),
+            data.frame(jittered_data_days(), #tibble with measure values for range of jitter
+                       measures$max_reachability[jittered_data_names()]),
             id, "jitter"))
+
+      output$plot_rounding <-
+        renderPlot(
+          plot_measure_over_anonymisation_gradient(
+            data.frame(rounded_data_days(), #tibble with measure values for rounding units (equiv in days)
+                       measures$max_reachability[rounded_data_names()]),
+            id, "rounding"))
 
     })}
