@@ -4,7 +4,7 @@
 
 #' @import lubridate
 #' @import dplyr
-#' @import rlang
+#' @importFrom rlang .data
 
 simplified_coarsen_date <- function(data, jitter,
                                     rounding_unit,
@@ -60,7 +60,7 @@ simplified_coarsen_date <- function(data, jitter,
     rounded_data <-
       data |>
       mutate(date =
-             floor_date(date,
+             floor_date(.data$date,
                         unit = rounding_unit,
                         week_start = week_start))
 
@@ -87,10 +87,10 @@ simplified_coarsen_date <- function(data, jitter,
 
       aggregated_data <-
         rounded_data |>
-        group_by(from, to, date) |>
-        summarise(summed_weight = sum(weight),  ...) |>
+        group_by(.data$from, .data$to, .data$date) |>
+        summarise(summed_weight = sum(.data$weight),  ...) |>
         ungroup() |>
-        rename(weight = summed_weight)
+        rename(weight = .data$summed_weight)
       #using "summed_weight" and then renaming to the data-specific weight
       #variable, to avoid problems with additional weight summarising
       #functions. If the original name is kept, any additional functions are
@@ -106,7 +106,7 @@ simplified_coarsen_date <- function(data, jitter,
 
       aggregated_data <-
         rounded_data |>
-        group_by(from, to, date) |>
+        group_by(.data$from, .data$to, .data$date) |>
         summarise(...) |>
         ungroup()
 

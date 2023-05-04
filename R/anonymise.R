@@ -2,6 +2,7 @@
 #library(shinyjs)
 
 #' @import shinyjs
+#' @importFrom utils write.table
 
 ######################################
 ### Anonymisation - User interface ###
