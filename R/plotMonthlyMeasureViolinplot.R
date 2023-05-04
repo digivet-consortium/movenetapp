@@ -1,4 +1,6 @@
-library(ggplot2)
+# library(ggplot2)
+#' @import ggplot2
+
 
 ###########################################################################
 ### Violin plot comparing distribs of monthly measures - User interface ###

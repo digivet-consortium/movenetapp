@@ -1,6 +1,10 @@
-library(lubridate)
-library(dplyr)
-library(rlang)
+#library(lubridate)
+#library(dplyr)
+#library(rlang)
+
+#' @import lubridate
+#' @import dplyr
+#' @import rlang
 
 simplified_coarsen_date <- function(data, jitter,
                                     rounding_unit,

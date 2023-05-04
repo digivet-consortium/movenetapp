@@ -1,6 +1,8 @@
 #On progress bars: https://shiny.rstudio.com/articles/progress.html
 #library(shinyjs)
 
+#' @import shinyjs
+
 ######################################
 ### Anonymisation - User interface ###
 ######################################

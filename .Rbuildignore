@@ -1,3 +1,6 @@
 ^movenetapp\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+notebooks
+reports
+releases

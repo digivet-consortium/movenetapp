@@ -1,11 +1,19 @@
 #On progress bars: https://shiny.rstudio.com/articles/progress.html
 
-library(dplyr)
-library(lubridate)
-library(networkDynamic)
-library(parallel)
-library(pbapply)
-library(shinyWidgets)
+#library(dplyr)
+#library(lubridate)
+#library(networkDynamic)
+#library(parallel)
+#library(pbapply)
+#library(shinyWidgets)
+
+#' @import lubridate
+#' @import dplyr
+#' @import networkDynamic
+#' @import parallel
+#' @import pbapply
+#' @import shinyWidgets
+
 
 ########################################
 ### Create networks - User interface ###

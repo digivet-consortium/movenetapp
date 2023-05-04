@@ -1,7 +1,8 @@
 #####################################
 ### Coarsen data - User interface ###
 #####################################
-library(lubridate)
+# library(lubridate)
+#' @import lubridate
 
 coarsenDataUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function

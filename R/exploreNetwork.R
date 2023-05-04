@@ -1,6 +1,10 @@
-library(network)
-library(networkDynamic)
-library(tsna)
+#library(network)
+#library(networkDynamic)
+#library(tsna)
+
+#' @import network
+#' @import networkDynamic
+#' @import tsna
 
 ########################################
 ### Explore network - User interface ###

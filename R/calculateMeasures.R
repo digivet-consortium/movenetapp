@@ -1,5 +1,9 @@
-library(pbapply)
-library(tsna)
+# library(pbapply)
+# library(tsna)
+
+#' @import pbapply
+#' @import tsna
+
 
 ##########################################################
 ### Calculate overall network measure - User interface ###

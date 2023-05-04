@@ -1,43 +1,21 @@
-library(rlang)
-library(checkmate)
-library(network)
-library(networkDynamic)
-library(tibble)
-library(tsna)
-library(dplyr)
-library(magrittr)
+#library(rlang)
+#library(checkmate)
+#library(network)
+#library(networkDynamic)
+#library(tibble)
+#library(tsna)
+#library(dplyr)
+#library(magrittr)
 
-#' Create dynamic networks from movenet-format movement data
-#'
-#' @param movement_data Movenet format movement data
-#' @param holding_data Movenet format holding data (optional)
-#' @param incl_nonactive_holdings Whether to include holdings from
-#'   `holding_data` that are not present in `movement_data`. Default is `FALSE`.
-#'   If set to `TRUE`, holdings that don't trade within the period covered by
-#'   `movement_data` are added to the network but set as non-active.
-#'
-#' @return Temporal network (directed) in networkDynamic format
-#'
-#' @details
-#' In the returned network, node identifiers are consecutive integers,
-#' which may not correspond to original holding identifiers as provided in
-#' `movement_data` and/or `holding_data`. The original holding identifiers (in
-#' character format) have been set as [<`persistent identifiers`>]
-#' [networkDynamic::persistent.ids] and can be accessed through
-#' `get.vertex.pid()`, or through the vertex attribute `true_id`.
-#'
-#' In the returned network, holdings are set to be active only during movement
-#' spells.
-#'
-#' @importFrom dplyr filter select
+#' @import rlang
 #' @import checkmate
-#' @importFrom magrittr %>%
 #' @import network
 #' @import networkDynamic
-#' @importFrom rlang :=
-#' @importFrom tibble add_row
-#'
-#' @export
+#' @import tibble
+#' @import tsna
+#' @import dplyr
+#' @import magrittr
+
 movedata2networkDynamic <- function(movement_data, holding_data = NULL,
                                     incl_nonactive_holdings = FALSE){
 
@@ -210,19 +188,6 @@ movedata2networkDynamic <- function(movement_data, holding_data = NULL,
   return(net)
 }
 
-
-#' Extract max reachabilities in parallel
-#'
-#' @param networks list of movement networks
-#' @param n_threads
-#'
-#' @return
-#'
-#' @importFrom parallel makeCluster clusterEvalQ stopCluster
-#' @importFrom pbapply pbsapply
-#' @importFrom tsna tReach
-#'
-#' @export
 parallel_max_reachabilities <- function(networks, n_threads){
   cl <- makeCluster(n_threads)
   on.exit(stopCluster(cl))
@@ -240,22 +205,7 @@ parallel_max_reachabilities <- function(networks, n_threads){
 # See https://bookdown.org/rdpeng/rprogdatascience/parallel-computation.html#building-a-socket-cluster
 # Using a socket cluster, as mclapply doesn't work on Windows
 
-#' Extract time periods covered in movement dataset
-#'
-#' @param data Date column of movement data
-#' @param period time period for which to extract dates (n days, week, n weeks,
-#'    month, n months, year, n years)
-#'
-#' @importFrom lubridate floor_date period
-#'
-#' @return List of c(start date, end date) for each period covered in the data,
-#'    with dates in int format
-#'
-#' @details For periods of days or weeks, the first date in the data is used
-#'    as starting date; for periods of months or years, the first day of the
-#'    month, n months, year or n years is used as starting date. (OR make
-#'    starting date an argument?)
-#' @export
+
 extract_periods <- function(data, period){
   if (isTRUE(grepl("(\\d+\\sdays)|((\\d+\\s)?week(\\s)?)",period))){
     start_dates <- seq(min(data), max(data), by = period)
@@ -269,26 +219,7 @@ extract_periods <- function(data, period){
   Map(c,start_dates,end_dates)
 }
 
-#' Extract periodic subnetworks from movement networks
-#'
-#' @param networks a named list of movement networks
-#' @param n_threads
-#' @param periods_in_data a list of start and end dates (in int format) for all periods in the data
-#'
-#' @return
-#'
-#' @importFrom networkDynamic network.extract
-#' @importFrom parallel makeCluster clusterExport stopCluster
-#' @importFrom pbapply pblapply
-#'
-#' @details Note from network.extract: Note that only active vertices are
-#'    included by default (retain.all.vertices=FALSE). As a result, the size of
-#'    the extracted network may be smaller than the original. Vertex and edge
-#'    ids will be translated, but may not correspond to their original values.
-#'    If it is necessary to maintain the identities of vertices, see
-#'    persistent.ids. (Make this an argument? Add ... to pass on arguments?)
-#'
-#' @export
+
 extract_periodic_subnetworks <- function(networks, n_threads, periods_in_data){
 
   cl <- makeCluster(n_threads)
@@ -308,17 +239,6 @@ extract_periodic_subnetworks <- function(networks, n_threads, periods_in_data){
 
 
 
-#' Draw violin plot of distributions of monthly values of a selected network measure, for various jittered & rounded networks
-#'
-#' @param monthly_data tibble with measure values, for monthly networks
-#' @param measure_name measure name (to refer to in y axis)
-#'
-#' @return
-#'
-#' @importFrom stringr str_wrap
-#' @importFrom tidyr pivot_longer
-#' @import ggplot2
-#'
 violinplot_monthly_measures <- function(monthly_data, measure_name){
 
   #Reformat to long tibble for plotting
@@ -347,17 +267,7 @@ violinplot_monthly_measures <- function(monthly_data, measure_name){
   plot(p)
 }
 
-#' Plot values of a measures for a varying range of jitter or rounding
-#'
-#' @param data tibble with measure values for range of jitter or rounding
-#' @param measure_name measure name (to refer to in y axis)
-#' @param anonymisation "jitter" or "round(ing)"
-#'
-#' @return
-#'
-#' @import ggplot2
-#'
-#' @export
+
 plot_measure_over_anonymisation_gradient <-
   function(data, measure_name, anonymisation){
     datacols <- colnames(data)

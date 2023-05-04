@@ -1,6 +1,11 @@
-library(ggplot2)
-library(stringr)
-library(tidyr)
+#library(ggplot2)
+#library(stringr)
+#library(tidyr)
+
+#' @import ggplot2
+#' @import stringr
+#' @import tidyr
+
 
 ###############################################################
 ### Plot measure over uncertainty gradient - User interface ###

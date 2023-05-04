@@ -1,13 +1,39 @@
 Package: movenetapp
-Title: What the Package Does (One Line, Title Case)
-Version: 0.1.0-1
+Title: Wrapper For Movenet Shiny App
+Date: 2023-05-04
+Version: 0.1.1-1
 Authors@R: 
-    person("Matt", "Denwood", , "md@sund.ku.dk", role = c("aut", "cre"))
+    c(person(given = "Carlijn", family = "Bogaardt",
+             email = "Carlijn.Bogaardt@glasgow.ac.uk", role = c("aut", "cre")),
+      person(given = "Matt", family = "Denwood",
+             email = "md@sund.ku.dk", role = c("ctb"))
+    )
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Imports:
+    checkmate,
+    dplyr,
+    ggplot2,
+    lubridate,
+    magrittr,
+    network,
+    networkDynamic,
+    parallel,
+    pbapply,
+    purrr,
+    readr,
+    rlang,
+    shiny,
+    shinyWidgets,
+    shinyjs,
+    stringr,
+    tibble,
+    tidyr,
+    tsna,
+    yaml
 Suggests: 
     knitr,
     rmarkdown,
