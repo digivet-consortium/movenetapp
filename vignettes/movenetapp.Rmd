@@ -1,0 +1,19 @@
+---
+title: "movenetapp"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{movenetapp}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(movenetapp)
+```

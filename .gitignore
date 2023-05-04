@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 movenet_app.Rproj
+inst/doc
+.DS_Store
