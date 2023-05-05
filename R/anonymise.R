@@ -1,7 +1,6 @@
 #On progress bars: https://shiny.rstudio.com/articles/progress.html
 #library(shinyjs)
 
-#' @import shinyjs
 #' @importFrom utils write.table
 
 ######################################
@@ -31,7 +30,7 @@ anonymiseUI <- function(id) {
     downloadButton(ns("download_csv"), "csv format (human readable)"),
     br(),
     br(),
-    p("For download in csv format, please indicate the following file options"),
+    p("For upload or download in csv format, please indicate the following file options"),
     fluidRow(
       column(2,
              textInput(ns("encoding"), "Encoding", value = "UTF-8")),
@@ -71,10 +70,27 @@ anonymiseServer <- function(id, movement_data, modified_movement_data){
     # Pseudonymise / anonymise holding identifiers
 
       observeEvent(input$anonymise, {
+        if(!is.null(input$key)){
+          ext <- strsplit(input$key$name, ".", fixed=T)[[1]][-1]
+          if(ext == "rda"){
+            load(input$key$datapath, envir = environment())
+          } else if(ext == "csv"){
+            df <- read_delim(input$key$datapath,
+                             delim = input$separator,
+                             locale = locale(decimal_mark = input$decimal,
+                                             encoding = input$encoding),
+                             col_names = FALSE,
+                             show_col_types = FALSE)
+            key <- as.character(df[[2]])
+            names(key) <- df[[1]]
+          }
+        } else {
+          key <- NULL
+        }
         ano_data_and_key <- internal_anonymise(selected_dataset(),
                                                col_to_anonymise = c(1,2),
                                                prefix = input$prefix,
-                                               key = input$key)
+                                               key = environment()$key)
         ano_data <- ano_data_and_key[[1]]
         ano_data_name <- paste0(input$data,"_Pseudonymised")
         anonymised_data[[ano_data_name]] <- ano_data
