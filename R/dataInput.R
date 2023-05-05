@@ -120,7 +120,7 @@ dataInputServer <- function(id) {
             lazy = TRUE
           )
 
-        sapply(select_input_names,
+        sapply(select_input_names(),
                function(x){
                  updateSelectInput(session, x,
                                    choices =
