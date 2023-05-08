@@ -86,7 +86,8 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
 
       observe({
         updateSelectInput(session, "datasets",
-                          choices = names(all_datasets()))})
+                          choices = names(all_datasets()),
+                          selected = "original")})
 
       selected_datasets <- reactive({all_datasets()[input$datasets]})
 
