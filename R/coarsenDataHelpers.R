@@ -165,7 +165,6 @@ parallel_coarsen_date <- function(data, n_threads, jitter_set, rounding_set,
 #' @importFrom plyr round_any
 #' @importFrom purrr has_element
 #' @importFrom stats runif
-#' @export
 simplified_coarsen_weight <- function(data, column, jitter, round){
 
   #####################

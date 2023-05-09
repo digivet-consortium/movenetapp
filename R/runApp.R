@@ -1,7 +1,6 @@
 #' Run the embedded shiny app
 #' @import shiny
 #' @import readr
-#' @import purrr
 #' @import yaml
 #'
 #' @export

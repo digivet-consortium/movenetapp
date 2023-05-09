@@ -14,7 +14,7 @@
 #' @import tibble
 #' @import tsna
 #' @import dplyr
-#' @import magrittr
+#' @importFrom magrittr %>%
 
 movedata2networkDynamic <- function(movement_data, holding_data = NULL,
                                     incl_nonactive_holdings = FALSE){

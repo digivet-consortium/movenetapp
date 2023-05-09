@@ -6,6 +6,7 @@
 #' @import networkDynamic
 #' @import tsna
 #' @importFrom sna component.dist
+#' @importFrom tidyr unnest
 
 ########################################
 ### Explore network - User interface ###
