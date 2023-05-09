@@ -48,31 +48,30 @@ coarsenDataUI <- function(id) {
              #function(existing_column_header)'. If providing multiple functions,
              #please separate with a comma.", tags$br(), "Example: 'mean_weight = mean(weight)'")
              )),
-    h3("Modify movement weights"),
-    fluidRow(
-      column(6,
-             h4("Jitter weights"),
-             tags$b("Range(s) of jitter (+/- n) to apply to weights"),
-             numericInput(ns("jitter_w_1"), label = NULL, min=0, value = 5),
-             numericInput(ns("jitter_w_2"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_3"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_4"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_5"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_sims"),
-                          "Number of simulations to perform per range",
-                          min = 0, value = 3)),
-      column(6,
-             h4("Round weights"),
-             #textInput(ns("rounding_units"), "Time unit to round dates down to"), #equivalent to function, may raise errors due to unacceptable time units
-             tags$b("Number to round weights to"),
-             numericInput(ns("jitter_w_1"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_2"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_3"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_4"), label = NULL, min=0, value = NULL),
-             numericInput(ns("jitter_w_5"), label = NULL, min=0, value = NULL))),
+    # h3("Modify movement weights"),
+    # fluidRow(
+    #   column(6,
+    #          h4("Jitter weights"),
+    #          tags$b("Range(s) of jitter (+/- n) to apply to weights"),
+    #          numericInput(ns("jitter_w_1"), label = NULL, min=0, value = 5),
+    #          numericInput(ns("jitter_w_2"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("jitter_w_3"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("jitter_w_4"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("jitter_w_5"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("jitter_w_sims"),
+    #                       "Number of simulations to perform per range",
+    #                       min = 0, value = 3)),
+    #   column(6,
+    #          h4("Round weights"),
+    #          tags$b("Number to round weights to"),
+    #          numericInput(ns("rounding_w_1"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("rounding_w_2"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("rounding_w_3"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("rounding_w_4"), label = NULL, min=0, value = NULL),
+    #          numericInput(ns("rounding_w_5"), label = NULL, min=0, value = NULL))),
     h3("Parallel processing"),
     numericInput(ns("n_threads"), label = "Number of threads available",
-                 min = 1, value = 1),
+                 min = 1, value = 4),
     actionButton(ns("modify_data"), "Modify movement data", width = "100%"),
     progressBar(ns("modify_data_pb"), value = 0, display_pct = TRUE),
   )
@@ -131,13 +130,37 @@ coarsenDataServer <- function(id, movement_data){
                                 week_start = week_start, #default is Monday in the app, Sunday/lubridate default in function)
                                 sum_weight = input$sum_weight)
         #NO alternative summary functions, can't get this to work correctly
-
         updateProgressBar(session, "modify_data_pb", value = 1,
                            total = 1, range_value = c(0, 1))
+
+        # jitter_w_set <- rep(c(input$jitter_w_1, input$jitter_w_2,
+        #                       input$jitter_w_3, input$jitter_w_4,
+        #                       input$jitter_w_5), input$jitter_w_sims)
+        # jitter_w_set <- jitter_w_set[which(jitter_w_set != 0 & !is.na(jitter_w_set))]
+        #
+        # rounding_w_set <- c(input$rounding_w_1, input$rounding_w_2,
+        #                     input$rounding_w_3, input$rounding_w_4,
+        #                     input$rounding_w_5)
+        # rounding_w_set <- rounding_w_set[which(rounding_w_set != 0 & !is.na(rounding_w_set))]
+        #
+        # ## N.B. The below doesnt work - in part because function has not actually
+        # ##      been parallelised fo multiple datasets!!
+        # datasets_w_coarsened_weights <-
+        #   parallel_coarsen_weight(data = datasets_w_coarsened_dates,
+        #                           n_threads = input$n_threads,
+        #                           jitter_set = jitter_w_set,
+        #                           rounding_set = rounding_w_set)
+        # updateProgressBar(session, "modify_data_pb", value = 2,
+        #                   total = 2, range_value = c(0, 2))
 
         lapply(seq_along(datasets_w_coarsened_dates),
                function(x){
                  modified_data[[names(datasets_w_coarsened_dates[x])]] <- datasets_w_coarsened_dates[[x]]})
+
+        # lapply(seq_along(datasets_w_coarsened_weights),
+        #        function(x){
+        #          modified_data[[names(datasets_w_coarsened_weights[x])]] <-
+        #            datasets_w_coarsened_weights[[x]]})
 
         })
 

@@ -5,6 +5,7 @@
 #' @import lubridate
 #' @import dplyr
 #' @importFrom rlang .data
+#'
 
 simplified_coarsen_date <- function(data, jitter,
                                     rounding_unit,
@@ -159,4 +160,89 @@ parallel_coarsen_date <- function(data, n_threads, jitter_set, rounding_set,
     make.unique(paste0("Dates", c(jitter_names, rounded_names)), sep="_")
 
   return(modified_datasets)
+}
+
+#' @importFrom plyr round_any
+#' @importFrom purrr has_element
+#' @importFrom stats runif
+#' @export
+simplified_coarsen_weight <- function(data, column, jitter, round){
+
+  #####################
+  ### Adding jitter ###
+  #####################
+
+  if (!isFALSE(jitter) | jitter != 0){
+
+    replacement_data <-
+      data[[column]] +
+      runif(length(data[[column]]), -jitter, +jitter)
+
+    while (any(replacement_data <= 0)){ #resampling if result of jitter is <= 0
+
+      replacement_data[which(replacement_data <= 0)] <-
+        data[[column]][which(replacement_data <= 0)] +
+        runif(sum(replacement_data <= 0), -jitter, +jitter)
+
+    }
+
+    data[column] <- replacement_data
   }
+
+  # Most suitable distribution? Currently uniform, but can change
+
+
+  ################
+  ### Rounding ###
+  ################
+
+  if (!isFALSE(round) | round != 0){
+
+    data[column] <- round_any(data[[column]], accuracy = round)
+
+    data[column][which(data[column] < round),] <- round #set round as minimum
+
+    #is it more efficient to filter first & only round if data[column] > round,
+    #or to just round everything?
+  }
+
+  return(data)
+}
+
+## N.B. The below doesnt work - in part because function has not actually
+##      been parallelised for multiple datasets!!
+parallel_coarsen_weight <- function(data, n_threads, jitter_set, rounding_set){
+
+  jitter_reps <- c(jitter_set, rep(FALSE, length(rounding_set)))
+  rounding_reps <- c(rep(FALSE, length(jitter_set)), rounding_set)
+
+  cl <- makeCluster(n_threads)
+  on.exit(stopCluster(cl))
+
+  clusterExport(cl, c("data", "jitter_reps", "rounding_reps"),
+                envir = environment())
+  clusterEvalQ(cl, {
+    library("dplyr")
+  })
+
+  modified_datasets <-
+    parLapply(cl = cl, seq_along(jitter_reps),
+              function(x){simplified_coarsen_weight(
+                data = data,
+                column = "weight",
+                jitter = jitter_reps[[x]],
+                round = rounding_reps[[x]])})
+
+  jitter_names <-
+    if(length(jitter_set) == 0){NULL
+    } else {paste0("Jittered_", jitter_set)}
+
+  rounded_names <-
+    if(length(rounding_set) == 0){NULL
+    } else {paste0("Rounded_", rounding_set)}
+
+  names(modified_datasets) <-
+    make.unique(paste0("Weights", c(jitter_names, rounded_names)), sep="_")
+
+  return(modified_datasets)
+}
