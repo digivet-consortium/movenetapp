@@ -1,7 +1,7 @@
 Package: movenetapp
 Title: Wrapper For Movenet Shiny App
 Date: 2023-05-09
-Version: 0.2.0-1
+Version: 0.2.1-1
 Authors@R: 
     c(person(given = "Carlijn", family = "Bogaardt",
              email = "Carlijn.Bogaardt@glasgow.ac.uk", role = c("aut", "cre")),
@@ -30,6 +30,7 @@ Imports:
     shiny,
     shinyWidgets,
     sna,
+    stats,
     stringr,
     tibble,
     tidyr,
