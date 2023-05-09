@@ -20,8 +20,8 @@ dataInputUI <- function(id) {
       column(4,
              h4("Config file"),
              br(),
-             p("Either upload an appropriate Movenet", id, "config file OR
-               complete the configurations to the right"),
+             p("EITHER upload an appropriate Movenet", id, "config file OR
+               complete the configurations to the right."),
              br(),
              fileInput(ns("config_file"), label = NULL,
                        accept = c("text/yaml", "text/yml", "text/x-yaml",
@@ -46,7 +46,7 @@ dataInputUI <- function(id) {
 
     actionButton(ns("extract"), "Extract and reformat relevant columns",
                  width = "100%"),
-    br(),
+    progressBar(ns("extract_pb"), value = 0, display_pct = TRUE),
     actionButton(ns("view_extracted_data"), "View extracted data",
                  width = "100%"),
     dataTableOutput(ns("datatable"))
@@ -156,6 +156,8 @@ dataInputServer <- function(id) {
 
         # Update the input_data reactiveValues to contain the extracted dataframe
         input_data$original <- dataframe
+
+        updateProgressBar(session, "extract_pb", value = 100)
       })
 
       # View the extracted data upon request via actionButton
