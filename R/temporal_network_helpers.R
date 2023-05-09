@@ -205,6 +205,20 @@ parallel_max_reachabilities <- function(networks, n_threads){
 # See https://bookdown.org/rdpeng/rprogdatascience/parallel-computation.html#building-a-socket-cluster
 # Using a socket cluster, as mclapply doesn't work on Windows
 
+parallel_reachabilities <- function(networks, n_threads, direction = c("fwd","bkwd")){
+  cl <- makeCluster(n_threads)
+  on.exit(stopCluster(cl))
+
+  clusterEvalQ(cl, {
+    library("tsna")
+  })
+
+  reachabilities <-
+    pblapply(networks,
+             function(x){tReach(x, direction, graph.step.time = 1)}, cl=cl)
+  return(reachabilities)
+}
+
 
 extract_periods <- function(data, period){
   if (isTRUE(grepl("(\\d+\\sdays)|((\\d+\\s)?week(\\s)?)",period))){
@@ -259,6 +273,7 @@ violinplot_monthly_measures <- function(monthly_data, measure_name){
     xlab("Movement network") +
     ylab(paste("Monthly", measure_name)) +
     ylim(0, NA) +
+    theme_bw() +
     scale_x_discrete(labels = function(x) str_wrap(as.character(x), width = 9))+
     geom_violin(trim = FALSE)
 
@@ -277,6 +292,7 @@ plot_measure_over_anonymisation_gradient <-
       ggplot(data = data,
              aes(x = .data[[anon_amount]], y = .data[[measure]],
                  group = .data[[anon_amount]])) +
+      theme_bw() +
       xlab(ifelse(anonymisation == "jitter", "Jitter (days)",
                   "Rounding unit equivalent (days)")) +
       ylab(measure_name) +
