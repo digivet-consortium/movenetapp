@@ -16,7 +16,7 @@ runMovenetApp <- function(){
       #tabPanel("Holding data",
       #         dataInputUI("holding")),
       "Make data non-identifiable",
-      tabPanel("Modify movement dates and/or weights",
+      tabPanel("Modify movement dates",# and/or weights",
                coarsenDataUI("coarsen")),
       tabPanel("Modify holding identifiers (pseudonymise)",
                anonymiseUI("anonymise")),
@@ -29,10 +29,10 @@ runMovenetApp <- function(){
                calculateMeasureUI("overall_measures")),
       tabPanel("Explore a single network",
                exploreNetworkUI("explore")),
-      tabPanel("Compare network measures across jitter/rounding ranges",
+      tabPanel("Compare reachability across jitter/rounding ranges",
                plotMeasureOverGradientUI("maximum reachability")),
-      tabPanel("Compare distributions of monthly measures across networks",
-               plotMonthlyMeasureViolinplotUI("maximum reachability")),
+      #tabPanel("Compare distributions of monthly measures across networks",
+      #         plotMonthlyMeasureViolinplotUI("maximum reachability")),
       #"Modelling",
       widths = c(3, 9)
     )
@@ -51,13 +51,13 @@ runMovenetApp <- function(){
                                anonymised_movement_data, #holding_data,
                                n_threads = reactive(input$threads))
     networks <- nw$networks
-    monthly_networks <- nw$monthly_networks
+    #monthly_networks <- nw$monthly_networks
     exploreNetworkServer("explore", networks, n_threads = reactive(input$threads))
     measures <- calculateMeasureServer("overall_measures", networks,
-                                       monthly_networks,
+                                       #monthly_networks,
                                        n_threads = reactive(input$threads))
     plotMeasureOverGradientServer("maximum reachability", measures)
-    plotMonthlyMeasureViolinplotServer("maximum reachability", measures)
+    #plotMonthlyMeasureViolinplotServer("maximum reachability", measures)
   }
 
 
