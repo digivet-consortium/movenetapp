@@ -13,6 +13,7 @@ calculateMeasureUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
     h3("Calculate network measures across all networks"),
+    p("Here, you can calculate network measures across all generated networks"),
     # fluidRow(
     #   column(4,
              # h4("Overall network measures"),

@@ -11,12 +11,13 @@ anonymiseUI <- function(id) {
   ns <- NS(id)
   tagList(
     h3("Pseudonymise or anonymise holding identifiers"),
-    p("This option pseudonymises or anonymises movement data by changing holding
-    identifiers to a number, or a prefix-number combination.\n
-    Unless a key is provided, new identifiers will be allocated in random order."),
+    p("Here, you can pseudonymise your movement data, by modifying holding identifiers."),
+    p("You can either change holding identifiers to a number or prefix-number
+    combination (allocated in random order), or upload a pseudonymisation key that
+    you wish to apply."),
     selectInput(ns("data"), "Select dataset to pseudonymise", choices = NULL),
-    textInput(ns("prefix"), "Prefix"),
-    fileInput(ns("key"), "Provide a pseudonymisation key to apply to the data (Optional)"),
+    textInput(ns("prefix"), "Prefix (optional)"),
+    fileInput(ns("key"), "Provide a pseudonymisation key to apply to the data (optional)"),
     #useShinyjs(),
     actionButton(ns("anonymise"), "Modify holding identifiers",
                  width = "100%"),

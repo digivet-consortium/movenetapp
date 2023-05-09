@@ -23,6 +23,7 @@ createNetworksUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
     h3("Create networks from datasets"),
+    p("Here, you can generate networks from one or more (reformatted) movement datasets."),
     selectInput(ns("datasets"), "Select dataset(s) to turn into networks",
                 choices = NULL, multiple = TRUE),
     actionButton(ns("create_networks"), "Generate networks", width = "100%"),

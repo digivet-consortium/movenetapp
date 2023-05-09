@@ -14,16 +14,14 @@
 exploreNetworkUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
-    #h3("Explore a movement network"),
-    fluidRow(
-      column(4,
-             selectInput(ns("network"), "Select network to explore", choices = NULL)),
-      column(6,
-             br(),
-             p("This page follows analyses, and recreates some plots,
-               from Schulz J et al. (2017) PLOS ONE 12(6): e0179915.",
-               tags$a(href="https://doi.org/10.1371/journal.pone.0179915",
-                      "https://doi.org/10.1371/journal.pone.0179915", target="_blank")))),
+    h3("Explore a movement network"),
+    p("Here, you can explore a selected network via basic data summaries and a
+    range of static and temporal network analyses."),
+    p("This page follows analyses and recreates some plots from Schulz J et al.
+      (2017) PLOS ONE 12(6): e0179915.",
+      tags$a(href="https://doi.org/10.1371/journal.pone.0179915",
+             "https://doi.org/10.1371/journal.pone.0179915", target="_blank")),
+    selectInput(ns("network"), "Select network to explore", choices = NULL),
 
 # Data summary measures ---------------------------------------------------
 

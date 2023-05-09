@@ -9,6 +9,8 @@ dataInputUI <- function(id) {
 # Data file upload --------------------------------------------------------
 
     h3("Upload", id, "data file"),
+    p("Here, you can upload a livestock movement data file (in csv format), that
+    you would like to make non-identifiable, or explore as a network."),
     fileInput(ns("data_file"), label = NULL,
               accept = c("text/csv", "text/comma-separated-values",
                          "text/plain", ".csv")),
@@ -16,6 +18,11 @@ dataInputUI <- function(id) {
 # Configurations ----------------------------------------------------------
 
     h3("Configurations"),
+    p("Please provide some configurations relating to your movement data file,
+      so that it can be read in and reformatted in a correct manner."),
+    p("We have made these configurations explicit, to avoid reliance on
+    assumptions inherent in underlying software, and to allow a broader range
+      of file formats to be read in correctly."),
     fluidRow(
       column(4,
              h4("Config file"),

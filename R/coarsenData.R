@@ -8,6 +8,15 @@ coarsenDataUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
     h3("Modify movement dates"),
+    p("Here, you can modify movement dates, in order to make your movement data
+      less identifiable."),
+    p("You can choose to jitter (add random noise to) dates and/or to round dates
+      (down to the first day of a selected time unit). For each jitter range or
+      rounding unit provided, a new dataset will be created. You can view these
+      datasets by selecting 'View and/or download datasets' in the sidebar menu."),
+    p("As jittering dates contains an element of randomisation, you can choose to
+      perform multiple simulations per range, resulting in the generation of multiple
+      equivalent datasets."),
     # selectInput(ns("dataset"),
     #             "Dataset to modify movement dates for",
     #             choices = NULL),

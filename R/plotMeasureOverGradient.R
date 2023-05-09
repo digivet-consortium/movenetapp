@@ -15,9 +15,13 @@ plotMeasureOverGradientUI <- function(id) {
   ns <- NS(id) # `NS(id)` returns a namespace function
   tagList(
     # Add explanatory blurb
-    h3(paste("Overall network", id, "for various ranges of jitter")),
+    h3(paste("Comparison of", id, "across ranges of date modifications")),
+    p(paste0("Here, you can explore the effect of date modifications on ", id,".")),
+    p("This may assist you in deciding how much jitter, or which rounding unit,
+      would be appropriate to apply to your dataset."),
+    h4(paste("Overall", id, "for various ranges of jitter")),
     plotOutput(ns("plot_jitter")),
-    h3(paste("Overall network", id, "for various units of rounding")),
+    h4(paste("Overall", id, "for various units of rounding")),
     plotOutput(ns("plot_rounding"))
   )
 }
