@@ -6,7 +6,8 @@
 #' @import networkDynamic
 #' @import tsna
 #' @importFrom sna component.dist
-#' @importFrom tidyr unnest
+#' @importFrom tidyr unnest pivot_longer
+#' @importFrom stats median na.omit
 
 ########################################
 ### Explore network - User interface ###
