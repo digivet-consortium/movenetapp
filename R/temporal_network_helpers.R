@@ -198,12 +198,37 @@ parallel_max_reachabilities <- function(networks, n_threads){
 
   max_reachabilities <-
     pbsapply(networks,
-              function(x){max(tReach(x, graph.step.time = 1))}, cl=cl)
+             function(x){max(tReach(x, graph.step.time = 1))}, cl=cl)
   return(max_reachabilities)
 }
-# N.B. This step is super-slow without parallel processing.
-# See https://bookdown.org/rdpeng/rprogdatascience/parallel-computation.html#building-a-socket-cluster
-# Using a socket cluster, as mclapply doesn't work on Windows
+
+parallel_movedata2networkDynamic <- function(datasets, n_threads){
+
+  ## DOES NOT WORK (progress bar... might need to use asynchronous programming)
+  ## see https://github.com/rstudio/shiny/issues/2196#issuecomment-1016858715
+
+  n <- length(datasets)
+  cl <- makeCluster(n_threads)
+  on.exit(stopCluster(cl))
+
+  clusterExport(cl, c("n","datasets", "session", "updateProgressBar"), envir = environment())
+  clusterEvalQ(cl, {
+    library("networkDynamic")
+  })
+
+  nw <-
+    pblapply(seq_along(datasets), function(x) {
+      net <- movedata2networkDynamic(datasets[[x]])
+      updateProgressBar(session, "create_networks_pb", value = x,
+                        #total = counts$n_allnetworks,  #with monthly nw
+                        total = n,  #w/o monthly nw
+                        #range_value = c(0, counts$n_allnetworks))  #with monthly nw
+                        range_value = c(0, n))  #w/o monthly nw
+      return(net)}, cl = cl) |>
+    setNames(names(datasets))
+  return(nw)
+}
+
 
 parallel_reachabilities <- function(networks, n_threads, direction = c("fwd","bkwd")){
   cl <- makeCluster(n_threads)

@@ -76,11 +76,11 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
 
         #Some useful variables
         counts$n_networks <- length(selected_datasets())
-        counts$months_in_data <-
-          extract_periods(movement_data$original[["date"]], "month")
-        counts$n_monthlynetworks <-
-          counts$n_networks * length(counts$months_in_data)
-        counts$n_allnetworks <- counts$n_networks + counts$n_monthlynetworks
+        # counts$months_in_data <-
+        #   extract_periods(movement_data$original[["date"]], "month")
+        # counts$n_monthlynetworks <-
+        #   counts$n_networks * length(counts$months_in_data)
+        # counts$n_allnetworks <- counts$n_networks + counts$n_monthlynetworks
 
         #Creating overall networks
         nw <-
@@ -93,6 +93,10 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
                               range_value = c(0, counts$n_networks))  #w/o monthly nw
             return(net)}) |>
           setNames(names(selected_datasets()))
+
+        ## Parallelised alternative - DOES NOT WORK (progress bar... might need to use asynchronous programming)
+        ## see https://github.com/rstudio/shiny/issues/2196#issuecomment-1016858715
+        # nw <- parallel_movedata2networkDynamic(selected_datasets(), input$n_threads)
 
         lapply(seq_along(nw), function(x){networks[[names(nw[x])]] <- nw[[x]]})
 
