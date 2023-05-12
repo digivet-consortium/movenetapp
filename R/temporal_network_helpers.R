@@ -298,10 +298,10 @@ plot_measure_over_anonymisation_gradient <-
       ylab(measure_name) +
       ylim(0, NA)
 
-    if(anonymisation == "jitter"){
-      p <- p + geom_boxplot()
-    } else {
-      p <- p + geom_point()}
+    # if(anonymisation == "jitter"){
+    #   p <- p + geom_boxplot()
+    # } else {
+      p <- p + geom_point()#}
 
     plot(p)
   }
