@@ -38,6 +38,7 @@ plotMeasureOverGradientServer <- function(id, measures) {
       non_pseudonymised_data_names <- reactive({
         names(measures$max_reachability)[which(!str_detect(names(measures$max_reachability),fixed("Pseudonymised")))]})
 
+
       jittered_data_names <- reactive({
         non_pseudonymised_data_names()[str_which(non_pseudonymised_data_names(), fixed("DatesJittered"))]})
       jittered_data_days <- reactive({
@@ -51,15 +52,17 @@ plotMeasureOverGradientServer <- function(id, measures) {
       output$plot_jitter <-
         renderPlot(
           plot_measure_over_anonymisation_gradient(
-            data.frame(jittered_data_days(), #tibble with measure values for range of jitter
-                       measures$max_reachability[jittered_data_names()]),
+            data.frame(c(0, jittered_data_days()), #data.frame with measure values for original data & jitter ranges
+                       c(measures$max_reachability["original"],
+                         measures$max_reachability[jittered_data_names()])),
             id, "jitter"))
 
       output$plot_rounding <-
         renderPlot(
           plot_measure_over_anonymisation_gradient(
-            data.frame(rounded_data_days(), #tibble with measure values for rounding units (equiv in days)
-                       measures$max_reachability[rounded_data_names()]),
+            data.frame(c(0, rounded_data_days()), #data.frame with measure values for original data & rounding units (equiv in days)
+                         c(measures$max_reachability["original"],
+                           measures$max_reachability[rounded_data_names()])),
             id, "rounding"))
 
     })}
