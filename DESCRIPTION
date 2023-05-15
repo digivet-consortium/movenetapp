@@ -1,7 +1,7 @@
 Package: movenetapp
 Title: Wrapper For Movenet Shiny App
-Date: 2023-05-13
-Version: 0.2.2-1
+Date: 2023-05-15
+Version: 0.2.3-1
 Authors@R: 
     c(person(given = "Carlijn", family = "Bogaardt",
              email = "Carlijn.Bogaardt@glasgow.ac.uk", role = c("aut", "cre")),
