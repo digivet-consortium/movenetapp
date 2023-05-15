@@ -13,7 +13,8 @@
 #' @import parallel
 #' @import pbapply
 #' @import shinyWidgets
-
+#' @import promises
+#' @importFrom future plan multisession
 
 ########################################
 ### Create networks - User interface ###
@@ -27,7 +28,13 @@ createNetworksUI <- function(id) {
     selectInput(ns("datasets"), "Select dataset(s) to turn into networks",
                 choices = NULL, multiple = TRUE),
     actionButton(ns("create_networks"), "Generate networks", width = "100%"),
-    progressBar(ns("create_networks_pb"), value = 0, display_pct = TRUE),
+    conditionalPanel(
+      condition = "input.create_networks > 0",
+      progressBar(ns("create_networks_pb"), value = 0, display_pct = TRUE,
+                  title = "Generating networks..."),
+      ns = NS(id)
+    )
+
   )
 }
 
@@ -74,45 +81,40 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
 
       observeEvent(input$create_networks, {
 
-        #Some useful variables
-        counts$n_networks <- length(selected_datasets())
-        # counts$months_in_data <-
-        #   extract_periods(movement_data$original[["date"]], "month")
-        # counts$n_monthlynetworks <-
-        #   counts$n_networks * length(counts$months_in_data)
-        # counts$n_allnetworks <- counts$n_networks + counts$n_monthlynetworks
+        plan("multisession", workers = n_threads())
+        #or:
+        #plan(multisession(workers = availableCores() - 1)) # Leave one core for Shiny itself
 
-        #Creating overall networks
-        nw <-
-          lapply(seq_along(selected_datasets()), function(x) {
-            net <- movedata2networkDynamic(selected_datasets()[[x]])
-            updateProgressBar(session, "create_networks_pb", value = x,
-                              #total = counts$n_allnetworks,  #with monthly nw
-                              total = counts$n_networks,  #w/o monthly nw
-                              #range_value = c(0, counts$n_allnetworks))  #with monthly nw
-                              range_value = c(0, counts$n_networks))  #w/o monthly nw
-            return(net)}) |>
-          setNames(names(selected_datasets()))
+        nw_count <- 0 #to keep track of networks created, for progress bar
+        n <- length(selected_datasets())
 
-        ## Parallelised alternative - DOES NOT WORK (progress bar... might need to use asynchronous programming)
-        ## see https://github.com/rstudio/shiny/issues/2196#issuecomment-1016858715
-        # nw <- parallel_movedata2networkDynamic(selected_datasets(), input$n_threads)
+        updateProgressBar(session, "create_networks_pb",
+                          value = 0, total = n, range_value = c(0, n),
+                          title = "Generating networks...")
 
-        lapply(seq_along(nw), function(x){networks[[names(nw[x])]] <- nw[[x]]})
-
-
-        # #Creating monthly subnetworks  - WORKS BUT TAKEN OUT FOR WORKSHOP
-        # monthly_nw <- extract_periodic_subnetworks(nw, n_threads(),
-        #                                            counts$months_in_data)
-        # updateProgressBar(session, "create_networks_pb",
-        #                   value = counts$n_allnetworks,
-        #                   total = counts$n_allnetworks,
-        #                   range_value = c(0, counts$n_allnetworks))
-        #
-        # lapply(seq_along(monthly_nw), function(x){
-        #   monthly_networks[[names(monthly_nw[x])]] <- monthly_nw[[x]]})
-
-        })
+        seq_len(n) %>%
+          lapply(FUN = function(i) {
+            df <- selected_datasets()[[i]]
+            future_promise({movenetapp:::movedata2networkDynamic(df)},
+                           globals = c("df"),
+                           envir = environment(),
+                           seed = TRUE
+                           ) %>%
+              then(function(nw){ networks[[names(selected_datasets()[i])]] <- nw }) %>%
+              finally(function(){
+                nw_count <<- nw_count + 1
+                updateProgressBar(session, "create_networks_pb",
+                                  value = nw_count, total = n,
+                                  range_value = c(0, n),
+                                  title = "Generating networks...")})
+          }) %>%
+          promise_all(.list = .) %>%
+          finally(function(){
+            updateProgressBar(session, "create_networks_pb",
+                              value = n, total = n, range_value = c(0, n),
+                              title = "Done!")
+            })
+       })
 
       return(list(networks = networks))#, monthly_networks = monthly_networks))
 

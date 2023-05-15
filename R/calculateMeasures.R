@@ -19,8 +19,12 @@ calculateMeasureUI <- function(id) {
              # h4("Overall network measures"),
              actionButton(ns("calc_max_reachability"),
                           "Maximum reachability (slow)", width = "100%"),
-             progressBar(ns("pb_max_reachability"), value = 0,
-                         display_pct = TRUE))#,
+    conditionalPanel(
+      condition = "input.calc_max_reachability > 0",
+      progressBar(ns("pb_max_reachability"), value = 0, display_pct = TRUE,
+                  title = "Calculating maximum reachabilities..."),
+      ns = NS(id)
+    ))
       # column(2),
       # column(4,
       #        h4("Monthly network measures"),
@@ -41,7 +45,8 @@ calculateMeasureServer <- function(id, networks, #monthly_networks,
     id,
     function(input, output, session) {
 
-      n_whole_networks <- reactive({length(networks)})
+      whole_nw <- reactive({reactiveValuesToList(networks)})
+      n_whole_networks <- reactive({length(whole_nw())})
       #monthly_nw <- reactive({reactiveValuesToList(monthly_networks)})
       #n_monthly_networks <-
       #  reactive({length(unlist(monthly_nw(), recursive = FALSE))})
@@ -52,13 +57,42 @@ calculateMeasureServer <- function(id, networks, #monthly_networks,
 
       observeEvent(input$calc_max_reachability, {
 
-        measures$max_reachability <-
-          parallel_max_reachabilities(networks, n_threads())
+        plan("multisession", workers = n_threads())
+        #or:
+        #plan(multisession(workers = availableCores() - 1)) # Leave one core for Shiny itself
+
+        count <- 0 #to keep track of measures calculated, for progress bar
+        n <- n_whole_networks()
+
         updateProgressBar(session, "pb_max_reachability",
-                          value = n_whole_networks(),
-                          total = n_whole_networks(),
-                          range_value = c(0, n_whole_networks()))
-        })
+                          value = 0, total = n, range_value = c(0, n),
+                          title = "Calculating maximum reachabilities...")
+
+        seq_len(n) %>%
+          lapply(FUN = function(i) {
+            nw <- whole_nw()[[i]]
+            future_promise({max(tsna::tReach(nw, graph.step.time = 1))},
+                           globals = c("nw"),
+                           envir = environment()) %>%
+              finally(function(){
+                count <<- count + 1
+                updateProgressBar(session, "pb_max_reachability",
+                                  value = count, total = n,
+                                  range_value = c(0, n),
+                                  title = "Calculating maximum reachabilities...")})
+          }) %>%
+          promise_all(.list = .) %>%
+          then(function(values){
+            named_values <- unlist(values) %>% setNames(names(whole_nw()))
+            measures$max_reachability <- named_values}) %>%
+          finally(function(){
+            updateProgressBar(session, "pb_max_reachability",
+                              value = n, total = n, range_value = c(0, n),
+                              title = "Done!")
+          })
+      })
+
+
 
 # # Maximum reachability (monthly) ------------------------------------------
 #

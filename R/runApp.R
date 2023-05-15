@@ -59,8 +59,22 @@ runMovenetApp <- function(){
     #plotMonthlyMeasureViolinplotServer("maximum reachability", measures)
   }
 
+  # Function to make the app
+  app <- shinyApp(ui = ui, server = server)
 
-  # Run the application
-  shinyApp(ui = ui, server = server)
+  # To ensure safe setting of multisession strategies inside the app, run app in
+  # local block, with on.exit statement
+  # https://github.com/rstudio/promises/issues/93#issuecomment-1557675136
+
+  local({
+    # Save the previous multisession strategy ("plan")
+    oplan <- future::plan()
+    # Restore the original multisession strategy upon exiting the local block,
+    # for potential continued use of the R session
+    on.exit({ future::plan(oplan) })
+
+    # Run app
+    shiny::runApp(app)
+  })
 
 }
