@@ -2,6 +2,7 @@
 #library(shinyjs)
 
 #' @importFrom utils write.table
+#' @importFrom magrittr `%>%`
 
 ######################################
 ### Anonymisation - User interface ###

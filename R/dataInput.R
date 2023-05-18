@@ -149,7 +149,7 @@ dataInputServer <- function(id) {
                             asciify = TRUE), #check that same as in Movenet
             col_types = cols(.default = col_character()),
             show_col_types = FALSE,
-            lazy = TRUE) |>
+            lazy = TRUE) %>%
           type_convert(col_types = cols(date = col_date(),
                                         weight = col_double(),
                                         coord_x = col_double(),

@@ -59,7 +59,7 @@ simplified_coarsen_date <- function(data, jitter,
   if (!isFALSE(rounding_unit)){
     # round down each date to the first date of the rounding_unit (e.g. month)
     rounded_data <-
-      data |>
+      data %>%
       mutate(date =
              floor_date(.data$date,
                         unit = rounding_unit,
@@ -87,10 +87,10 @@ simplified_coarsen_date <- function(data, jitter,
     if (isTRUE(sum_weight)){
 
       aggregated_data <-
-        rounded_data |>
-        group_by(.data$from, .data$to, .data$date) |>
-        summarise(summed_weight = sum(.data$weight),  ...) |>
-        ungroup() |>
+        rounded_data %>%
+        group_by(.data$from, .data$to, .data$date) %>%
+        summarise(summed_weight = sum(.data$weight),  ...) %>%
+        ungroup() %>%
         rename(weight = .data$summed_weight)
       #using "summed_weight" and then renaming to the data-specific weight
       #variable, to avoid problems with additional weight summarising
@@ -106,9 +106,9 @@ simplified_coarsen_date <- function(data, jitter,
     } else {
 
       aggregated_data <-
-        rounded_data |>
-        group_by(.data$from, .data$to, .data$date) |>
-        summarise(...) |>
+        rounded_data %>%
+        group_by(.data$from, .data$to, .data$date) %>%
+        summarise(...) %>%
         ungroup()
 
       return(aggregated_data)

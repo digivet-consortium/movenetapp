@@ -91,7 +91,7 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
                               total = counts$n_networks,  #w/o monthly nw
                               #range_value = c(0, counts$n_allnetworks))  #with monthly nw
                               range_value = c(0, counts$n_networks))  #w/o monthly nw
-            return(net)}) |>
+            return(net)}) %>%
           setNames(names(selected_datasets()))
 
         ## Parallelised alternative - DOES NOT WORK (progress bar... might need to use asynchronous programming)

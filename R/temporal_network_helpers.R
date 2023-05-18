@@ -109,9 +109,9 @@ movedata2networkDynamic <- function(movement_data, holding_data = NULL,
   #Reformat data to the specific column order, and integer vertex.ids and dates,
   #required by networkDynamic. Then create the network.
 
-  movement_data[1:3] <- movement_data[1:3] |> lapply(as.numeric)
+  movement_data[1:3] <- movement_data[1:3] %>% lapply(as.numeric)
   movement_data <-
-    movement_data[,c(3,3,1,2,4:length(movement_data))] |>
+    movement_data[,c(3,3,1,2,4:length(movement_data))] %>%
     data.frame(stringsAsFactors = FALSE)
 
   net <- networkDynamic(edge.spells = movement_data, verbose = FALSE,
@@ -224,7 +224,7 @@ parallel_max_reachabilities <- function(networks, n_threads){
 #                         total = n,  #w/o monthly nw
 #                         #range_value = c(0, counts$n_allnetworks))  #with monthly nw
 #                         range_value = c(0, n))  #w/o monthly nw
-#       return(net)}, cl = cl) |>
+#       return(net)}, cl = cl) %>%
 #     setNames(names(datasets))
 #   return(nw)
 # }
@@ -282,7 +282,7 @@ violinplot_monthly_measures <- function(monthly_data, measure_name){
 
   #Reformat to long tibble for plotting
   monthly_measures <-
-    monthly_data |>
+    monthly_data %>%
     pivot_longer(everything(),
                  names_to = "network",
                  values_to = measure_name)
