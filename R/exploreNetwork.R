@@ -313,13 +313,13 @@ exploreNetworkServer <- function(id, networks, n_threads){
             sapply(get.edge.attribute.active(selected_network(), "weight", onset = t, #list of edges during period
                                              terminus = as.integer(as_date(t)+months(1)),
                                              return.tea = TRUE, require.active = TRUE),
-                   function(x) x[[1]]) |> #extract edge weights
-              unlist() |>
-              na.omit()}) |>
+                   function(x) x[[1]]) %>% #extract edge weights
+              unlist() %>%
+              na.omit()}) %>%
           periodic_data2summary_stats_df(dates_data$monthly, "month")
 
         output$weights_summary <-
-          renderDataTable({monthly_weights_summary_stats |>
+          renderDataTable({monthly_weights_summary_stats %>%
               mutate(month = format(month, "%b %Y"))})
 
         #Plotting monthly summary stats for movement weights
@@ -383,7 +383,7 @@ exploreNetworkServer <- function(id, networks, n_threads){
         monthly_tempnw <-
           extract_periodic_subnetworks(
             list(selected_network()), n_threads(),
-            Map(c,dates_data$monthly_int,as.integer(dates_data$monthly+months(1)))) |>
+            Map(c,dates_data$monthly_int,as.integer(dates_data$monthly+months(1)))) %>%
           unlist(recursive = FALSE)
         updateProgressBar(session, "pb_reachabilities",
                           value = 1, total = 3,

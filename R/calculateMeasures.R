@@ -110,7 +110,7 @@ calculateMeasureServer <- function(id, networks, #monthly_networks,
 #                                      total = n_monthly_networks(),
 #                                      range_value = c(0, n_monthly_networks()))
 #                    return(max_reach)
-#                  }) |>
+#                  }) %>%
 #           setNames(names(monthly_nw()))
 #         })
 

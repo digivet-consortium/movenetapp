@@ -99,8 +99,8 @@ snapshot_summary_stats_linechart <- function(periodic_data, title, ylab){
 periodic_data2summary_stats_df <-
   function(periodic_data, period_dates, period = c("month", "year")){
   df <-
-    lapply(periodic_data, function(x){summary(x) |> round(digits = 3) |> unclass()}) |>
-    bind_rows() |>
+    lapply(periodic_data, function(x){summary(x) %>% round(digits = 3) %>% unclass()}) %>%
+    bind_rows() %>%
     `colnames<-`(c("min", "Q1", "median", "mean", "Q3", "max"))
   df <- cbind(period_dates, df)
   names(df)[1] <- period
