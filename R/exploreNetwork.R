@@ -112,7 +112,8 @@ exploreNetworkServer <- function(id, networks, n_threads){
 
       observe({
         updateSelectInput(session, "network",
-                          choices = names(all_networks()))})
+                          choices = names(all_networks()),
+                          selected = "original")})
 
 # Setting up useful handles -----------------------------------------------
 
