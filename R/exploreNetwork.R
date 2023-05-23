@@ -90,8 +90,12 @@ exploreNetworkUI <- function(id) {
                  min = 1, value = 4),
     actionButton(ns("calc_reachabilities"),
                  "Calculate reachabilities (slow)", width = "100%"),
-    progressBar(ns("pb_reachabilities"), value = 0,
-                display_pct = TRUE),
+    conditionalPanel(
+      condition = "input.calc_reachabilities > 0",
+      progressBar(ns("pb_reachabilities"), value = 0, display_pct = TRUE,
+                  title = "Calculating reachabilities..."),
+      ns = NS(id)
+    ),
     fluidRow(
       column(6, plotOutput(ns("fwd_reachability_plot"))),
       column(6, plotOutput(ns("bkwd_reachability_plot"))))

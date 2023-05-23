@@ -76,7 +76,12 @@ coarsenDataUI <- function(id) {
     numericInput(ns("n_threads"), label = "Number of threads available",
                  min = 1, value = 4),
     actionButton(ns("modify_data"), "Modify movement data", width = "100%"),
-    progressBar(ns("modify_data_pb"), value = 0, display_pct = TRUE),
+    conditionalPanel(
+      condition = "input.modify_data !== 0",
+      progressBar(ns("modify_data_pb"), value = 0, display_pct = TRUE,
+                  title = "Modifying data..."),
+      ns = NS(id)
+    )
   )
 }
 #Scale up for datasets, or for different amounts of jitter or rounding?
@@ -114,6 +119,10 @@ coarsenDataServer <- function(id, movement_data){
 
 
       observeEvent(input$modify_data, {
+
+        updateProgressBar(session, "modify_data_pb", value = 0, total = 1,
+                          range_value = c(0, 1), title = "Modifying data...")
+
         jitter_d_set <- c(input$jitter_d_1, input$jitter_d_2, input$jitter_d_3)
         # jitter_d_set <- rep(c(input$jitter_d_1, input$jitter_d_2,
         #                       input$jitter_d_3), input$jitter_d_sims)
@@ -132,8 +141,8 @@ coarsenDataServer <- function(id, movement_data){
                                 week_start = week_start, #default is Monday in the app, Sunday/lubridate default in function)
                                 sum_weight = input$sum_weight)
         #NO alternative summary functions, can't get this to work correctly
-        updateProgressBar(session, "modify_data_pb", value = 1,
-                           total = 1, range_value = c(0, 1))
+        updateProgressBar(session, "modify_data_pb", value = 1, total = 1,
+                          range_value = c(0, 1), title = "Done!")
 
         # jitter_w_set <- rep(c(input$jitter_w_1, input$jitter_w_2,
         #                       input$jitter_w_3), input$jitter_w_sims)

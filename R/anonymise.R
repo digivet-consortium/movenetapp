@@ -22,7 +22,12 @@ anonymiseUI <- function(id) {
     #useShinyjs(),
     actionButton(ns("anonymise"), "Modify holding identifiers",
                  width = "100%"),
-    progressBar(ns("anonymise_pb"), value = 0, display_pct = TRUE),
+    conditionalPanel(
+      condition = "input.anonymise > 0",
+      progressBar(ns("anonymise_pb"), value = 0, display_pct = TRUE,
+                  title = "Pseudonymising data..."),
+      ns = NS(id)
+    ),
     # conditionalPanel("false", # always hide the download button
     #                  downloadButton(ns("download_key")))
     #br(),
@@ -72,6 +77,10 @@ anonymiseServer <- function(id, movement_data, modified_movement_data){
     # Pseudonymise / anonymise holding identifiers
 
       observeEvent(input$anonymise, {
+
+        updateProgressBar(session, "anonymise_pb", value = 0,
+                    title = "Pseudonymising data...")
+
         if(!is.null(input$key)){
           ext <- strsplit(input$key$name, ".", fixed=T)[[1]][-1]
           if(ext == "rda"){
@@ -102,8 +111,8 @@ anonymiseServer <- function(id, movement_data, modified_movement_data){
 
         #runjs(paste0("$('#", ns("download_key"),"')[0].click();")) # click hidden download button
 
-        updateProgressBar(session, "anonymise_pb", value = 1,
-                          total = 1, range_value = c(0, 1))
+        updateProgressBar(session, "anonymise_pb", value = 1, total = 1,
+                          range_value = c(0, 1), title = "Done!")
         })
 
       observe({

@@ -53,11 +53,19 @@ dataInputUI <- function(id) {
 
     actionButton(ns("extract"), "Extract and reformat relevant columns",
                  width = "100%"),
-    progressBar(ns("extract_pb"), value = 0, display_pct = TRUE),
-    actionButton(ns("view_extracted_data"), "View extracted data",
-                 width = "100%"),
-    dataTableOutput(ns("datatable"))
-
+    conditionalPanel(
+      condition = "input.extract > 0",
+      progressBar(ns("extract_pb"), value = 0, display_pct = TRUE,
+                  title = "Extracting and reformatting data..."),
+      ns = NS(id)
+    ),
+    conditionalPanel(
+      condition = "input.extract > 0",
+      actionButton(ns("view_extracted_data"), "View extracted data",
+                   width = "100%"),
+      dataTableOutput(ns("datatable")),
+      ns = NS(id)
+    )
   )
 }
 
@@ -139,6 +147,9 @@ dataInputServer <- function(id) {
 
       observeEvent(input$extract, {
 
+        updateProgressBar(session, "extract_pb", value = 0,
+                          title = "Extracting and reformatting data...")
+
         dataframe <-
           read_delim(
             input$data_file$datapath,
@@ -164,7 +175,7 @@ dataInputServer <- function(id) {
         # Update the input_data reactiveValues to contain the extracted dataframe
         input_data$original <- dataframe
 
-        updateProgressBar(session, "extract_pb", value = 100)
+        updateProgressBar(session, "extract_pb", value = 100, title = "Done!")
       })
 
       # View the extracted data upon request via actionButton
