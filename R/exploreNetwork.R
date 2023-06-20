@@ -93,7 +93,7 @@ exploreNetworkUI <- function(id) {
     conditionalPanel(
       condition = "input.calc_reachabilities > 0",
       progressBar(ns("pb_reachabilities"), value = 0, display_pct = TRUE,
-                  title = "Calculating reachabilities..."),
+                  title = "Extracting monthly subnetworks & calculating reachabilities..."),
       ns = NS(id)
     ),
     fluidRow(
@@ -384,34 +384,72 @@ exploreNetworkServer <- function(id, networks, n_threads){
 
       observeEvent(input$calc_reachabilities, {
 
-        monthly_tempnw <-
-          extract_periodic_subnetworks(
-            list(selected_network()), n_threads(),
-            Map(c,dates_data$monthly_int,as.integer(dates_data$monthly+months(1)))) %>%
-          unlist(recursive = FALSE)
-        updateProgressBar(session, "pb_reachabilities",
-                          value = 1, total = 3,
-                          range_value = c(0, 3))
-        fwd_reachability <-
-          parallel_reachabilities(monthly_tempnw, n_threads(), direction = "fwd")
-        updateProgressBar(session, "pb_reachabilities",
-                          value = 2, total = 3,
-                          range_value = c(0, 3))
-        bkwd_reachability <-
-          parallel_reachabilities(monthly_tempnw, n_threads(), direction = "bkwd")
-        updateProgressBar(session, "pb_reachabilities",
-                          value = 3, total = 3,
-                          range_value = c(0, 3))
+        plan("multisession", workers = n_threads())
 
-        output$fwd_reachability_plot <- renderPlot({ snapshot_boxplot(
-          unnest(tibble(dates_data$monthly, fwd_reachability), fwd_reachability),
-          "Forward reachable set (out-going contact chain) sizes per month",
-          "Size")})
-        output$bkwd_reachability_plot <- renderPlot({snapshot_boxplot(
-          unnest(tibble(dates_data$monthly, bkwd_reachability), bkwd_reachability),
-          "Backward reachable set (in-going contact chain) sizes per month",
-          "Size")})
+        count_m <- 0
+        n <- length(dates_data$monthly_int)
 
+        updateProgressBar(session, "pb_reachabilities",
+                          value = 0, total = n, range_value = c(0, n),
+                          title = "Extracting monthly subnetworks & calculating reachabilities...")
+
+        #For each month in the dataset,
+        Map(c, dates_data$monthly_int, as.integer(dates_data$monthly+months(1))) %>%
+          lapply(function(period) {
+            nw <- selected_network()
+            # ...extract the monthly subnetwork
+            future_promise({
+              networkDynamic::network.extract(nw, onset = period[[1]],
+                                              terminus = period[[2]], rule = "any",
+                                              retain.all.vertices = FALSE,
+                                              trim.spells = TRUE)},
+              globals = c("nw","period"),
+              envir = environment()) %>%
+              finally(function(){
+                count_m <<- count_m + 1
+                updateProgressBar(session, "pb_reachabilities",
+                                  value = count_m, total = 2*n,
+                                  range_value = c(0, 2*n),
+                                  title = "Extracting monthly subnetworks & calculating reachabilities...")}) %>%
+              # ...calculate forward and backward reachabilities
+              then(function(monthly_nw){
+                future_promise({
+                  fwd_reachability <- tsna::tReach(monthly_nw, "fwd", graph.step.time = 1)
+                  bkwd_reachability <- tsna::tReach(monthly_nw, "bkwd", graph.step.time = 1)
+                  list(fwd_reachability = fwd_reachability,
+                       bkwd_reachability = bkwd_reachability)},
+                  globals = "monthly_nw",
+                  envir = environment()) %>%
+                  finally(function(){
+                    count_m <<- count_m + 1
+                    updateProgressBar(session, "pb_reachabilities",
+                                      value = count_m, total = 2*n,
+                                      range_value = c(0, 2*n),
+                                      title = "Extracting monthly subnetworks & calculating reachabilities...")})
+                  })
+              }) %>%
+          # wait until all reachabilities are calculated, then combine
+          promise_all(.list = .) %>%
+          then(function(reachabilities){
+            #transpose: from monthly lists of fwd & bkwd reach, to list of monthly fwd reach & list of monthly bkwd reach
+            values <- purrr::transpose(reachabilities)
+            fwd_reachabilities <- values$fwd_reachability
+            bkwd_reachabilities <- values$bkwd_reachability
+            #plot reachability box plots
+            output$fwd_reachability_plot <- renderPlot({ snapshot_boxplot(
+              unnest(tibble(dates_data$monthly, fwd_reachabilities), fwd_reachabilities),
+              "Forward reachable set (out-going contact chain) sizes per month",
+              "Size")})
+            output$bkwd_reachability_plot <- renderPlot({snapshot_boxplot(
+              unnest(tibble(dates_data$monthly, bkwd_reachabilities), bkwd_reachabilities),
+              "Backward reachable set (in-going contact chain) sizes per month",
+              "Size")})
+          }) %>%
+          finally(function(){
+            updateProgressBar(session, "pb_reachabilities",
+                              value = 2*n, total = 2*n, range_value = c(0, 2*n),
+                              title = "Done!")
+          })
       })
 
 
