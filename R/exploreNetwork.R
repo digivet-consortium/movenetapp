@@ -333,7 +333,9 @@ exploreNetworkServer <- function(id, networks, n_threads){
         #Extracting monthly summary stats for movement weights
         monthly_weights_summary_stats <-
           lapply(dates_data$monthly_int, FUN = function(t) {
-            sapply(get.edge.attribute.active(selected_network(), "weight", onset = t, #list of edges during period
+            sapply(get.edge.attribute.active(selected_network(),
+                                             movenetenv$options$movedata_cols$weight,
+                                             onset = t, #list of edges during period
                                              terminus = as.integer(as_date(t)+months(1)),
                                              return.tea = TRUE, require.active = TRUE),
                    function(x) x[[1]]) %>% #extract edge weights

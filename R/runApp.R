@@ -1,19 +1,21 @@
 #' Run the embedded shiny app
+#' @import movenet
 #' @import shiny
+#' @import shinyFeedback
 #' @import readr
 #' @import yaml
 #'
 #' @export
-runMovenetApp <- function(){
+runMovenetApp <- function(...){
 
   ui <- fluidPage(
     titlePanel("Movenet"),
     navlistPanel(
       "Input datasets",
-      tabPanel("Input movement data",
+      tabPanel("Movement data",
                dataInputUI("movement")),
-      #tabPanel("Holding data",
-      #         dataInputUI("holding")),
+      tabPanel("Holding data",
+               dataInputUI("holding")),
       "Make data non-identifiable",
       tabPanel("Modify movement dates",# and/or weights",
                coarsenDataUI("coarsen")),
@@ -40,14 +42,14 @@ runMovenetApp <- function(){
 
   server <- function(input, output) {
     movement_data <- dataInputServer("movement")
-    #holding_data <- dataInputServer("holding")
+    holding_data <- dataInputServer("holding")
     modified_movement_data <- coarsenDataServer("coarsen", movement_data)
     anonymised_movement_data <- anonymiseServer("anonymise", movement_data,
                                                 modified_movement_data)
     viewDataServer("view_data", movement_data, modified_movement_data,
                    anonymised_movement_data)
     nw <- createNetworksServer("networks", movement_data, modified_movement_data,
-                               anonymised_movement_data, #holding_data,
+                               holding_data, #modified_holding_data,
                                n_threads = reactive(input$threads))
     networks <- nw$networks
     #monthly_networks <- nw$monthly_networks
@@ -74,7 +76,7 @@ runMovenetApp <- function(){
     on.exit({ future::plan(oplan) })
 
     # Run app
-    shiny::runApp(app)
+    shiny::runApp(app, ...)
   })
 
 }
