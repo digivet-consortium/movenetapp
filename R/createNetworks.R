@@ -1,12 +1,5 @@
 #On progress bars: https://shiny.rstudio.com/articles/progress.html
 
-#library(dplyr)
-#library(lubridate)
-#library(networkDynamic)
-#library(parallel)
-#library(pbapply)
-#library(shinyWidgets)
-
 #' @import lubridate
 #' @import dplyr
 #' @import networkDynamic
@@ -25,8 +18,11 @@ createNetworksUI <- function(id) {
   tagList(
     h3("Create networks from datasets"),
     p("Here, you can generate networks from one or more (reformatted) movement datasets."),
-    selectInput(ns("datasets"), "Select dataset(s) to turn into networks",
+    selectInput(ns("datasets"), labelMandatory("Select movement dataset(s) to turn into networks"),
                 choices = NULL, multiple = TRUE),
+    selectInput(ns("holding_dataset"), "Select holding dataset",
+                choices = NULL),
+    checkboxInput(ns("incl_nonactive_holdings"), "Include non-active holdings?"),
     actionButton(ns("create_networks"), "Generate networks", width = "100%"),
     conditionalPanel(
       condition = "input.create_networks > 0",
@@ -43,7 +39,8 @@ createNetworksUI <- function(id) {
 ######################################
 
 createNetworksServer <- function(id, movement_data, modified_movement_data,
-                                 anonymised_movement_data, n_threads){
+                                 holding_data, #modified_holding_data,
+                                 n_threads){
   moduleServer(
     id,
     function(input, output, session) {
@@ -56,26 +53,28 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
 
       modified_datasets <-
         reactive({reactiveValuesToList(modified_movement_data)})
-      anonymised_datasets <-
-        reactive({reactiveValuesToList(anonymised_movement_data)})
       all_datasets <-
         reactive({c(reactiveValuesToList(movement_data),
-                    modified_datasets()[order(names(modified_datasets()))],
-                    anonymised_datasets()[order(names(anonymised_datasets()))])})
+                    modified_datasets()[order(names(modified_datasets()))])})
+
+      # modified_holding_datasets <-
+      #   reactive({reactiveValuesToList(modified_holding_data)})
+      all_holding_datasets <-
+        reactive({c(reactiveValuesToList(holding_data)#,
+                    #modified_holding_datasets()[order(names(modified_holding_datasets()))]
+                    )})
 
       observe({
         updateSelectInput(session, "datasets",
                           choices = names(all_datasets()),
+                          selected = "original")
+        updateSelectInput(session, "holding_dataset",
+                          choices = names(all_holding_datasets()),
                           selected = "original")})
 
       selected_datasets <- reactive({all_datasets()[input$datasets]})
+      selected_holding_dataset <- reactive({all_holding_datasets()[[input$holding_dataset]]})
 
-
-# # Anonymise holding ids ---------------------------------------------------
-#
-#         #Change holding ids to numbers (required for temporal networks)
-#         anonymised_data <- simplified_anonymise(movement_data())
-#         movement_data(anonymised_data)
 
 # Create temporal networks ------------------------------------------------
 
@@ -95,8 +94,13 @@ createNetworksServer <- function(id, movement_data, modified_movement_data,
         seq_len(n) %>%
           lapply(FUN = function(i) {
             df <- selected_datasets()[[i]]
-            future_promise({movenetapp:::movedata2networkDynamic(df)},
-                           globals = c("df"),
+            holding_data <- selected_holding_dataset()
+            incl_nonactive <- input$incl_nonactive_holdings
+            future_promise({movenet::movedata2networkDynamic(df,
+                                                    holding_data,
+                                                    incl_nonactive)},
+                           globals = c("df", "holding_data", "incl_nonactive",
+                                       "movedata2networkDynamic"),
                            envir = environment(),
                            seed = TRUE
                            ) %>%

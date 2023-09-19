@@ -71,14 +71,25 @@ exploreNetworkUI <- function(id) {
     h4("Component analysis"),
     fluidRow(
       column(6, plotOutput(ns("GSCC_size_plot"))),
-      column(6, tags$b("Section under development:"),
+      column(6,
+             p("The largest giant strongly connected component (GSCC) is the largest
+               number of nodes (holdings) that can all reach each other by some
+               directed path of movements. This means that any node in that set
+               could indirectly infect any other, or that a single source outbreak
+               within the component could theoretically infect anything else
+               within that component."),
+             tags$b("Section under development:"),
              p("Similar plots for giant in component (GIC) and giant out component
                (GOC) will be added shortly."))),
     br(),
     h4("Loyalty"),
     fluidRow(
       column(6, plotOutput(ns("common_links_heatmap"))),
-      column(6, tags$b("Section under development"))),
+      column(6,
+             p("This is a measure of consistency in the network between different
+               points in time. Darker colours indicate a larger proportion of trades
+               that are in common between two months. The black diagonal
+               indicates that each month’s movements are identical to themselves."))),
     br(),
 
 # Temporal network analysis -----------------------------------------------
@@ -98,8 +109,16 @@ exploreNetworkUI <- function(id) {
     ),
     fluidRow(
       column(6, plotOutput(ns("fwd_reachability_plot"))),
-      column(6, plotOutput(ns("bkwd_reachability_plot"))))
+      column(6, plotOutput(ns("bkwd_reachability_plot")))),
+    fluidRow(
+      p("The forward reachable set (or out-going contact chain) of a single node
+        is the set of nodes that can be reached from that origin node, or alternatively
+        the set of nodes that could theoretically be infected in an outbreak
+        starting at that node. That is, the set of nodes that are reachable from
+        some origin node are the reachable set of that origin node. The backward
+        reachable set (or in-going contact chain) is the set of nodes that reach a node.")
     )
+  )
 }
 
 ######################################
@@ -314,7 +333,9 @@ exploreNetworkServer <- function(id, networks, n_threads){
         #Extracting monthly summary stats for movement weights
         monthly_weights_summary_stats <-
           lapply(dates_data$monthly_int, FUN = function(t) {
-            sapply(get.edge.attribute.active(selected_network(), "weight", onset = t, #list of edges during period
+            sapply(get.edge.attribute.active(selected_network(),
+                                             movenetenv$options$movedata_cols$weight,
+                                             onset = t, #list of edges during period
                                              terminus = as.integer(as_date(t)+months(1)),
                                              return.tea = TRUE, require.active = TRUE),
                    function(x) x[[1]]) %>% #extract edge weights
@@ -451,7 +472,6 @@ exploreNetworkServer <- function(id, networks, n_threads){
                               title = "Done!")
           })
       })
-
 
 })}
 
