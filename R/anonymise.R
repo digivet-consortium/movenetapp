@@ -112,7 +112,6 @@ anonymiseServer <- function(id, movement_data, modified_movement_data){
 
         updateProgressBar(session, "anonymise_pb", value = 1, total = 1,
                           range_value = c(0, 1), title = "Done!")
-        browser()
         })
 
       observe({
