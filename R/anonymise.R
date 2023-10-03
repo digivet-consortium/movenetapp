@@ -11,7 +11,7 @@
 anonymiseUI <- function(id) {
   ns <- NS(id)
   tagList(
-    h3("Pseudonymise or anonymise holding identifiers"),
+    h3("Pseudonymise: modify holding identifiers"),
     p("Here, you can pseudonymise your movement data, by modifying holding identifiers."),
     p("You can either change holding identifiers to a number or prefix-number
     combination (allocated in random order), or upload a pseudonymisation key that
@@ -98,10 +98,9 @@ anonymiseServer <- function(id, movement_data, modified_movement_data){
         } else {
           key <- NULL
         }
-        ano_data_and_key <- internal_anonymise(selected_dataset(),
-                                               col_to_anonymise = c(1,2),
-                                               prefix = input$prefix,
-                                               key = environment()$key)
+        ano_data_and_key <- anonymise(selected_dataset(),
+                                      prefix = input$prefix,
+                                      key = environment()$key)
         ano_data <- ano_data_and_key[[1]]
         ano_data_name <- paste0(input$data,"_Pseudonymised")
         anonymised_data[[ano_data_name]] <- ano_data
