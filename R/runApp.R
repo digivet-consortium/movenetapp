@@ -17,8 +17,12 @@ runMovenetApp <- function(...){
       tabPanel("Holding data",
                dataInputUI("holding")),
       "Make data non-identifiable",
-      tabPanel("Modify movement dates",# and/or weights",
-               coarsenDataUI("coarsen")),
+      tabPanel("Modify movement dates",
+               coarsenDatesUI("coarsen")),
+      tabPanel("Modify movement weights",
+               coarsenWeightsUI("weights")),
+      tabPanel("Modify optional numeric movement data",
+               coarsenWeightsUI("numeric_data")),
       tabPanel("Modify holding identifiers (pseudonymise)",
                anonymiseUI("anonymise")),
       tabPanel("View and/or download datasets",
@@ -43,7 +47,13 @@ runMovenetApp <- function(...){
   server <- function(input, output) {
     movement_data <- dataInputServer("movement")
     holding_data <- dataInputServer("holding")
-    modified_movement_data <- coarsenDataServer("coarsen", movement_data)
+    modified_movement_data <- reactiveValues()
+    modified_movement_data <- coarsenDatesServer("coarsen", movement_data,
+                                                 modified_movement_data)
+    modified_movement_data <- coarsenWeightsServer("weights", movement_data,
+                                                   modified_movement_data)
+    modified_movement_data <- coarsenWeightsServer("numeric_data", movement_data,
+                                                   modified_movement_data)
     anonymised_movement_data <- anonymiseServer("anonymise", movement_data,
                                                 modified_movement_data)
     viewDataServer("view_data", movement_data, modified_movement_data,
