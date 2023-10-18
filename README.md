@@ -3,9 +3,9 @@
 
 # movenetapp
 
-The movenet app provides a graphical user interface to the \[movenet
-package\] (<https://digivet-consortium.github.io/movenet/>), in the form
-of a Shiny app.
+The movenet app provides a graphical user interface to the [movenet
+package](https://digivet-consortium.github.io/movenet/), in the form of
+a Shiny app.
 
 The goal of movenet and the movenet app is to simplify the effective use
 of livestock movement data in veterinary public health. It facilitates
@@ -54,8 +54,8 @@ holding data:
   properties.
 
 For more detail on each of these workflows, see the vignettes on the
-\[movenet package website\]
-(<https://digivet-consortium.github.io/movenet/>).
+[movenet package
+website](https://digivet-consortium.github.io/movenet/).
 
 ## Installation
 

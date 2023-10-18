@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 ```
 
 # movenetapp
-The movenet app provides a graphical user interface to the [movenet package] (https://digivet-consortium.github.io/movenet/), in the form of a Shiny app. 
+The movenet app provides a graphical user interface to the [movenet package](https://digivet-consortium.github.io/movenet/), in the form of a Shiny app. 
 
 The goal of movenet and the movenet app is to simplify the effective use of livestock movement data in veterinary 
 public health. It facilitates the dataflow from livestock movement data to social 
@@ -22,6 +22,7 @@ network analysis and disease transmission models, while addressing common data i
 such as the diversity of data formats and privacy preservation.
 
 ![Flow chart showing the workflows of the movenet package, as well as how movenet addresses some common data challenges.](man/figures/movenet_summary.png)
+
 
 movenet and the movenet app are being developed in the context of the [NordForsk Digitalisation of livestock data to improve veterinary public health (DigiVet) project](https://www.nordforsk.org/projects/digitalisation-livestock-data-improve-veterinary-public-health).
 
@@ -40,7 +41,7 @@ movenet and the movenet app include a range of workflows for the processing and 
   
   -	exploration of the effects of different pseudonymisation strategies on network properties, so as to allow users to find a suitable balance between the identifiability of the data and the accuracy of these properties.
   
-For more detail on each of these workflows, see the vignettes on the [movenet package website] (https://digivet-consortium.github.io/movenet/).
+For more detail on each of these workflows, see the vignettes on the [movenet package website](https://digivet-consortium.github.io/movenet/).
 
 ## Installation
 
