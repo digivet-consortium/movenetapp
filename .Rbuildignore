@@ -4,3 +4,4 @@
 notebooks
 reports
 releases
+^README\.Rmd$
