@@ -81,3 +81,43 @@ To launch the movenet app, run the following:
 ``` r
 movenetapp::runMovenetApp()
 ```
+
+## Example use case scenario 1
+
+You work at a veterinary health agency, and want to collaborate with
+external experts to model the spread of a potential ASF outbreak in your
+country. You need to make livestock transport data non-identifiable, but
+you are concerned about the impact that modifying movement dates may
+have on any analyses.
+
+1.  Input and reformat your movement dataset
+2.  Apply a range of different date modifications
+3.  (View the datasets to check the results)
+4.  Generate networks for some or all modified datasets
+5.  Calculate network measures across your networks (currently
+    implemented for maximum reachability only)
+6.  View the network measure comparison page. Decide on a jitter range
+    or rounding unit that provides a good balance between preservation
+    of privacy, and low impact on network measures of interest
+    (e.g. maximum reachability).
+7.  Pseudonymise the chosen modified dataset. Download the dataset and
+    send it to your collaborators. Download the key and save it
+    somewhere safe, to de-pseudonymise any future modelling results.
+
+## Example use case scenario 2
+
+You have just read a paper that applies network analysis to a pig
+transport network in another country, and discusses its implications for
+disease control. You are keen to know how transferable the results and
+implications would be to your own country’s livestock movement network,
+in case of an ASF outbreak. You have access to livestock movement data,
+and would have liked to do a similar study – but you lack the
+resources/time/R skills. Luckily, a quick network exploration with the
+movenet app could provide some clues.
+
+1.  Input and reformat your movement dataset
+2.  Generate a network for the movement dataset
+3.  Explore the data summaries and network analyses on the “Explore a
+    single network” page. How do these compare to the results in the
+    paper? Does anything of interest jump out at you, that would be
+    worth looking into in more detail in a more elaborate study?
