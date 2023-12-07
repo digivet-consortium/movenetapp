@@ -1,14 +1,20 @@
 Package: movenetapp
-Title: Wrapper For Movenet Shiny App
+Title: A 'Shiny' interface to the 'movenet' package for livestock movement data
 Date: 2023-05-18
 Version: 0.2.4-1
 Authors@R: 
     c(person(given = "Carlijn", family = "Bogaardt",
              email = "Carlijn.Bogaardt@glasgow.ac.uk", role = c("aut", "cre")),
+      person(given = "Jess", family = "Enright",
+             email = "Jessica.Enright@glasgow.ac.uk", role = c("ctb")),
       person(given = "Matt", family = "Denwood",
              email = "md@sund.ku.dk", role = c("ctb"))
     )
-Description: What the package does (one paragraph).
+Description: A graphical user interface for the 'movenet' package, facilitating 
+  the use of livestock movement data in veterinary public health. The app 
+  contains workflows for data processing, pseudonymisation and creation of 
+  synthetic data, and network analysis of livestock movement and holding 
+  datasets.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

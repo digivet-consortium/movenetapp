@@ -4,15 +4,16 @@
 \name{movenetapp-package}
 \alias{movenetapp}
 \alias{movenetapp-package}
-\title{movenetapp: Wrapper For Movenet Shiny App}
+\title{movenetapp: A 'Shiny' interface to the 'movenet' package for livestock movement data}
 \description{
-What the package does (one paragraph).
+A graphical user interface for the 'movenet' package, facilitating the use of livestock movement data in veterinary public health. The app contains workflows for data processing, pseudonymisation and creation of synthetic data, and network analysis of livestock movement and holding datasets.
 }
 \author{
 \strong{Maintainer}: Carlijn Bogaardt \email{Carlijn.Bogaardt@glasgow.ac.uk}
 
 Other contributors:
 \itemize{
+  \item Jess Enright \email{Jessica.Enright@glasgow.ac.uk} [contributor]
   \item Matt Denwood \email{md@sund.ku.dk} [contributor]
 }
 
