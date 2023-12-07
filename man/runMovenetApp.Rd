@@ -4,7 +4,7 @@
 \alias{runMovenetApp}
 \title{Run the embedded shiny app}
 \usage{
-runMovenetApp()
+runMovenetApp(...)
 }
 \description{
 Run the embedded shiny app
