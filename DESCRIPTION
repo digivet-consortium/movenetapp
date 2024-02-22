@@ -39,6 +39,7 @@ Imports:
     readr,
     rlang,
     shiny,
+    shinyjs,
     shinyFeedback,
     shinyWidgets,
     sna,

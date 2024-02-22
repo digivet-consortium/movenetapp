@@ -68,6 +68,8 @@ coarsenWeightsServer <- function(id, movement_data, modified_movement_data){
     id,
     function(input, output, session) {
 
+      movenetenv <- movenet:::movenetenv
+
       modified_datasets <-
         reactive({reactiveValuesToList(modified_movement_data)})
       modified_datasets_w_no_weight_changes <-

@@ -130,6 +130,8 @@ exploreNetworkServer <- function(id, networks, n_threads){
     id,
     function(input, output, session) {
 
+      movenetenv <- movenet:::movenetenv
+
       all_networks <-
         reactive({reactiveValuesToList(networks)[order(names(networks))]})
 

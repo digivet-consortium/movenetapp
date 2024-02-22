@@ -1,4 +1,3 @@
-
 labelMandatory <- function(label) {
   tagList(
     label,
@@ -10,8 +9,6 @@ appCSS <- ".mandatory_star { color: red; }"
 
 selectInputs_empty <- c("", "Select appropriate column header",
                         "Click 'Populate' to fill with column headers")
-
-movenetenv <- movenet:::movenetenv
 
 ###################################
 ### Data Input - User interface ###
@@ -115,6 +112,7 @@ dataInputServer <- function(id) {
     function(input, output, session) {
 
 # Setting up some useful handles ------------------------------------------
+      movenetenv <- movenet:::movenetenv
 
       # Input names for all textInputs
       text_input_names <- reactive({
@@ -171,10 +169,10 @@ dataInputServer <- function(id) {
 
         #Validate file options and save as configs
         if(input$encoding == ""){
-          showFeedbackDanger(inputId = "encoding", text = paste("Required"))
+          shinyFeedback::showFeedbackDanger(inputId = "encoding", text = paste("Required"))
           encoding_valid <- FALSE
         } else {
-          hideFeedback("encoding"); encoding_valid <- TRUE
+          shinyFeedback::hideFeedback("encoding"); encoding_valid <- TRUE
           if(id == "movement"){
             movenetenv$options$movedata_fileopts$encoding <- input$encoding
           } else if(id == "holding") {
@@ -182,16 +180,16 @@ dataInputServer <- function(id) {
         }}
 
         if(input$separator == ""){
-          hideFeedback("separator")
-          showFeedbackDanger(inputId = "separator", text = paste("Required"))
+          shinyFeedback::hideFeedback("separator")
+          shinyFeedback::showFeedbackDanger(inputId = "separator", text = paste("Required"))
           separator_valid <- FALSE
         } else if(nchar(input$separator) > 1){
-          hideFeedback("separator")
-          showFeedbackDanger(inputId = "separator",
+          shinyFeedback::hideFeedback("separator")
+          shinyFeedback::showFeedbackDanger(inputId = "separator",
                              text = paste("Must be a single character"))
           separator_valid <- FALSE
         } else {
-          hideFeedback("separator"); separator_valid <- TRUE
+          shinyFeedback::hideFeedback("separator"); separator_valid <- TRUE
           if(id == "movement"){
             movenetenv$options$movedata_fileopts$separator <- input$separator
           } else if(id == "holding") {
@@ -199,16 +197,16 @@ dataInputServer <- function(id) {
         }}
 
         if(input$decimal == ""){
-          hideFeedback("decimal")
-          showFeedbackDanger(inputId = "decimal", text = paste("Required"))
+          shinyFeedback::hideFeedback("decimal")
+          shinyFeedback::showFeedbackDanger(inputId = "decimal", text = paste("Required"))
           decimal_valid <- FALSE
         } else if(nchar(input$decimal) > 1){
-          hideFeedback("decimal")
-          showFeedbackDanger(inputId = "decimal",
+          shinyFeedback::hideFeedback("decimal")
+          shinyFeedback::showFeedbackDanger(inputId = "decimal",
                              text = paste("Must be a single character"))
           decimal_valid <- FALSE
         } else {
-          hideFeedback("decimal"); decimal_valid <- TRUE
+          shinyFeedback::hideFeedback("decimal"); decimal_valid <- TRUE
           if(id == "movement"){
             movenetenv$options$movedata_fileopts$decimal <- input$decimal
           } else if(id == "holding") {
@@ -217,16 +215,16 @@ dataInputServer <- function(id) {
 
         if(id == "movement"){
           if(input$date_format == ""){
-            hideFeedback("date_format")
-            showFeedbackDanger(inputId = "date_format", text = paste("Required"))
+            shinyFeedback::hideFeedback("date_format")
+            shinyFeedback::showFeedbackDanger(inputId = "date_format", text = paste("Required"))
             date_format_valid <- FALSE
           } else if(isFALSE(movenet:::is_valid_date_format(input$date_format))){
-            hideFeedback("date_format")
-            showFeedbackDanger(inputId = "date_format",
+            shinyFeedback::hideFeedback("date_format")
+            shinyFeedback::showFeedbackDanger(inputId = "date_format",
                                text = paste("Must be a valid readr date format"))
             date_format_valid <- FALSE
           } else {
-            hideFeedback("date_format"); date_format_valid <- TRUE
+            shinyFeedback::hideFeedback("date_format"); date_format_valid <- TRUE
             movenetenv$options$movedata_fileopts$date_format <- input$date_format}
         }
 
@@ -234,34 +232,34 @@ dataInputServer <- function(id) {
           movenetenv$options$holdingdata_fileopts$country_code <- NULL
           if(input$country_code == "" &&
              any(!(c(input$coord_x, input$coord_y) %in% selectInputs_empty))){
-            hideFeedback("country_code")
-            showFeedbackDanger(inputId = "country_code",
+            shinyFeedback::hideFeedback("country_code")
+            shinyFeedback::showFeedbackDanger(inputId = "country_code",
                                text = paste("Required for inclusion of geographical coordinates"))
             country_code_valid <- FALSE
           } else if(input$country_code != "" &&
                     isFALSE(movenet:::is_valid_country_code(input$country_code))){
-            showFeedbackDanger(inputId = "country_code",
+            shinyFeedback::showFeedbackDanger(inputId = "country_code",
                                text = paste("Must be two uppercase letters"))
             country_code_valid <- FALSE
           } else {
-            hideFeedback("country_code"); country_code_valid <- TRUE
+            shinyFeedback::hideFeedback("country_code"); country_code_valid <- TRUE
             if(input$country_code != ""){
               movenetenv$options$holdingdata_fileopts$country_code <- input$country_code}}
 
           movenetenv$options$holdingdata_fileopts$coord_EPSG_code <- NULL
           if(input$coord_EPSG_code == "" &&
              any(!(c(input$coord_x, input$coord_y) %in% selectInputs_empty))){
-            hideFeedback("coord_EPSG_code")
-            showFeedbackDanger(inputId = "coord_EPSG_code",
+            shinyFeedback::hideFeedback("coord_EPSG_code")
+            shinyFeedback::showFeedbackDanger(inputId = "coord_EPSG_code",
                                text = paste("Required for inclusion of geographical coordinates"))
             coord_EPSG_code_valid <- FALSE
           } else if(input$coord_EPSG_code != "" &&
                     isFALSE(test_integerish(input$coord_EPSG_code))){
-            showFeedbackDanger(inputId = "coord_EPSG_code",
+            shinyFeedback::showFeedbackDanger(inputId = "coord_EPSG_code",
                                text = paste("Must be an integer"))
             coord_EPSG_code_valid <- FALSE
           } else {
-            hideFeedback("coord_EPSG_code"); coord_EPSG_code_valid <- TRUE
+            shinyFeedback::hideFeedback("coord_EPSG_code"); coord_EPSG_code_valid <- TRUE
             if(input$coord_EPSG_code != ""){
               movenetenv$options$holdingdata_fileopts$coord_EPSG_code <- input$coord_EPSG_code}}
         }
@@ -269,31 +267,31 @@ dataInputServer <- function(id) {
         #Validate columns and save as configs
         if(id == "movement"){
           if(input$from %in% selectInputs_empty){
-            showFeedbackDanger(inputId = "from", text = paste("Required"))
+            shinyFeedback::showFeedbackDanger(inputId = "from", text = paste("Required"))
             from_valid <- FALSE
           } else {
-            hideFeedback("from"); from_valid <- TRUE
+            shinyFeedback::hideFeedback("from"); from_valid <- TRUE
             movenetenv$options$movedata_cols$from <- input$from }
 
           if(input$to %in% selectInputs_empty){
-            showFeedbackDanger(inputId = "to", text = paste("Required"))
+            shinyFeedback::showFeedbackDanger(inputId = "to", text = paste("Required"))
             to_valid <- FALSE
           } else {
-            hideFeedback("to"); to_valid <- TRUE
+            shinyFeedback::hideFeedback("to"); to_valid <- TRUE
             movenetenv$options$movedata_cols$to <- input$to }
 
           if(input$weight %in% selectInputs_empty){
-            showFeedbackDanger(inputId = "weight", text = paste("Required"))
+            shinyFeedback::showFeedbackDanger(inputId = "weight", text = paste("Required"))
             weight_valid <- FALSE
           } else {
-            hideFeedback("weight"); weight_valid <- TRUE
+            shinyFeedback::hideFeedback("weight"); weight_valid <- TRUE
             movenetenv$options$movedata_cols$weight <- input$weight }
 
           if(input$date %in% selectInputs_empty){
-            showFeedbackDanger(inputId = "date", text = paste("Required"))
+            shinyFeedback::showFeedbackDanger(inputId = "date", text = paste("Required"))
             date_valid <- FALSE
           } else {
-            hideFeedback("date"); date_valid <- TRUE
+            shinyFeedback::hideFeedback("date"); date_valid <- TRUE
             movenetenv$options$movedata_cols$date <- input$date }
 
           movenetenv$options$movedata_cols[
@@ -307,33 +305,33 @@ dataInputServer <- function(id) {
 
         if(id == "holding"){
           if(input$id %in% selectInputs_empty){
-            showFeedbackDanger(inputId = "id", text = paste("Required"))
+            shinyFeedback::showFeedbackDanger(inputId = "id", text = paste("Required"))
             id_valid <- FALSE
           } else {
-            hideFeedback("id"); id_valid <- TRUE
+            shinyFeedback::hideFeedback("id"); id_valid <- TRUE
             movenetenv$options$holdingdata_cols$id <- input$id }
 
           movenetenv$options$holdingdata_cols$coord_x <- NULL
           if(input$coord_x %in% selectInputs_empty &&
              !(input$coord_y %in% selectInputs_empty)){
-            showFeedbackDanger(inputId = "coord_x",
+            shinyFeedback::showFeedbackDanger(inputId = "coord_x",
                                text =
                                  paste("Required for inclusion of geographical coordinates"))
             coord_x_valid <- FALSE
           } else {
-            hideFeedback("coord_x"); coord_x_valid <- TRUE
+            shinyFeedback::hideFeedback("coord_x"); coord_x_valid <- TRUE
             if(!(input$coord_x %in% selectInputs_empty)){
               movenetenv$options$holdingdata_cols$coord_x <- input$coord_x }}
 
           movenetenv$options$holdingdata_cols$coord_y <- NULL
           if(input$coord_y %in% selectInputs_empty &&
              !(input$coord_x %in% selectInputs_empty)){
-            showFeedbackDanger(inputId = "coord_y",
+            shinyFeedback::showFeedbackDanger(inputId = "coord_y",
                                text =
                                  paste("Required for inclusion of geographical coordinates"))
             coord_y_valid <- FALSE
           } else {
-            hideFeedback("coord_y"); coord_y_valid <- TRUE
+            shinyFeedback::hideFeedback("coord_y"); coord_y_valid <- TRUE
             if(!(input$coord_y %in% selectInputs_empty)){
               movenetenv$options$holdingdata_cols$coord_y <- input$coord_y }}
 
@@ -396,10 +394,10 @@ dataInputServer <- function(id) {
                                 HTML("The uploaded file is not a valid config file:<ul><li>",
                                 paste0(failed_validation_messages, collapse = "</li><li>"),"</li></ul>"),
                                 easyClose = TRUE))
-          showFeedbackDanger(inputId = "config_file",
+          shinyFeedback::showFeedbackDanger(inputId = "config_file",
                              text = paste("Invalid",id,"config file, please upload another file."))
         } else {
-          hideFeedback("config_file")
+          shinyFeedback::hideFeedback("config_file")
 
           # Load config into movenetenv
           load_config(input$config_file$datapath)
