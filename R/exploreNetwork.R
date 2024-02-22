@@ -30,7 +30,7 @@ exploreNetworkUI <- function(id) {
     h3("Basic network summary"),
     h4("Network size"),
     p(tags$b("Overall network size:"), textOutput(ns("network_size"), inline = TRUE),
-      "holdings active over the whole time period"),
+      "holdings active over the observed time period"),
     fluidRow(
       column(6, dataTableOutput(ns("size_summary"))),
       column(6, align = "center",
@@ -42,11 +42,11 @@ exploreNetworkUI <- function(id) {
     br(),
     h4("Movements and edges (links)"),
     p(tags$b("Overall number of movements:"), textOutput(ns("n_moves"), inline = TRUE),
-      "movements over the whole time period"),
+      "movements over the observed time period"),
     p(tags$b("Overall number of edges:"), textOutput(ns("edge_count"), inline = TRUE),
-      "different links between holdings over the whole time period"),
+      "different links between holdings over the observed time period"),
     p(tags$b("Overall edge density:"), textOutput(ns("edge_density"), inline = TRUE),
-      "of all possible links between holdings are observed over the whole time period"),
+      "of all possible links between holdings are observed over the observed time period"),
     fluidRow(
       column(6, dataTableOutput(ns("moves_summary"))),
       column(6, align = "center",

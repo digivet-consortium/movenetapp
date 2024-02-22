@@ -138,7 +138,7 @@ monthxmonth_heatmap <- function(month_combinations, title){
     theme_bw() +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
           legend.title = element_blank(),
-          legend.position = "bottom",
+          legend.position = "right",
           legend.text = element_text(size = 12),
           plot.title = element_text(size = 16, face = "bold"),
           axis.text = element_text(size = 12),
